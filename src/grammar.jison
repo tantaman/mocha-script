@@ -4,7 +4,7 @@ jison grammar.jison tokens.jisonlex
 
 %{
 	function paramStr(a1, a2) {
-		if (a2)
+		if (a2 != '')
 			return a1 + "," + a2;
 		else
 			return a1;
@@ -39,7 +39,7 @@ sexp
 	| sfn
 		{$$ = $1;}
 	| LPAREN id params RPAREN
-		{$$ = $1 + "(" + $2 + ")"}
+		{$$ = $2 + "(" + $3 + ")"}
 	| LPAREN mathy params RPAREN
 		{
 			var fn;
@@ -91,13 +91,7 @@ mathy
 	;
 
 params
-	: sexp params
-		{$$ = paramStr($1, $2);}
-	| id params
-		{$$ = paramStr($1, $2);}
-	| STRING params
-		{$$ = paramStr($1, $2);}
-	| NUMBER params
+	: exp params
 		{$$ = paramStr($1, $2);}
 	|
 		{$$ = '';}
@@ -134,8 +128,48 @@ exp
 		{$$ = yytext;}
 	| STRING
 		{$$ = yytext;}
+	| jsdata
+		{$$ = $1;}
 	| sexp
 		{$$ = $1;}
+	;
+
+jsdata
+	: jsobject
+		{$$ = $1}
+	| jsarray
+		{$$ = $1}
+	;
+
+jsobject
+	: LCURLY jskeyvalpairs RCURLY
+		{$$ = "{" + $2 + "}"}
+	;
+
+jskeyvalpairs
+	: jskey COLON exp jskeyvalpairs
+		{$$ = $1 + ":" + paramStr($3, $4);}
+	|
+		{$$ = '';}
+	;
+
+jskey
+	: id
+		{$$ = $1}
+	| STRING
+		{$$ = yytext}
+	;
+
+jsarray
+	: LBRACKET jsarrayentries RBRACKET
+		{$$ = "[" + $2 + "]"}
+	;
+
+jsarrayentries
+	: exp jsarrayentries
+		{$$ = paramStr($1, $2);}
+	|
+		{$$ = '';}
 	;
 
 /*TODO: switch statements needs optimization.  This will kill us if they are run in a loop*/
@@ -170,7 +204,7 @@ sfn
 
 fnparams
 	: id fnparams
-		{$$ = $1 + ',' + $2;}
+		{$$ = paramStr($1, $2);}
 	|
 		{$$ = '';}
 	;

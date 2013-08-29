@@ -8,3 +8,7 @@
 	(+ "123" 2)
 	(+ 3 1)
 )
+
+(map (fn (x) (* 2 x)) [1 2 3 4 5 6])
+
+(pluck [{name:'beet' organic:false} {name:'carrot' organic:true}] 'organic')

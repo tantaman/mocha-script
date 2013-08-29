@@ -8,6 +8,7 @@ propaccess                  \.[a-zA-Z$_][a-zA-Z0-9$_]*
 ")"							return 'RPAREN';
 "!"							return 'SET';
 \"[^"]*\"					return 'STRING';
+\'[^']*\'					return 'STRING';
 {number}					return 'NUMBER';
 "let"						return 'LET';
 "if"						return 'IF';
@@ -15,6 +16,12 @@ propaccess                  \.[a-zA-Z$_][a-zA-Z0-9$_]*
 "fn"						return 'FN';
 {propaccess}				return 'PROPACCESS';
 {id}						return 'ID';
+":"							return 'COLON';
+","							return 'COMMA';
+"{"							return 'LCURLY';
+"}"							return 'RCURLY';
+"["							return 'LBRACKET';
+"]"							return 'RBRACKET';
 "="                         return 'MATHY';
 "+"                         return 'MATHY';
 "-"                         return 'MATHY';
