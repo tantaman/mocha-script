@@ -11,7 +11,7 @@ propaccess                  \.[a-zA-Z$_][a-zA-Z0-9$_]*
 {number}					return 'NUMBER';
 "let"						return 'LET';
 "if"						return 'IF';
-"case"						return 'CASE';
+"switch"					return 'SWITCH';
 "fn"						return 'FN';
 {propaccess}				return 'PROPACCESS';
 {id}						return 'ID';
