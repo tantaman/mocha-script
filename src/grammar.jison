@@ -45,7 +45,7 @@ sexp
 			var fn;
 			switch($2) {
 			case '=':
-				fn = 'equal';
+				fn = 'eq';
 				break;
 			case '+':
 				fn = 'plus';
@@ -68,9 +68,20 @@ sexp
 			case '<=':
 				fn = 'lte';
 				break;
+			case '/':
+				fn = 'divide';
+				break;
 			}
 
-			$$ = fn + ".call(null, " + $params + ")";
+			// TODO: another example of why we need to build a graph of nodes first.
+			var count = $params.split(",").length;
+			if (count == 2) {
+				$$ = 'b' + fn + "(" + $params + ")";
+			} else if(count == 1) {
+				$$ = 'u' + fn + "(" + $params + ")";
+			} else {
+				$$ = fn + ".call(null, " + $params + ")";
+			}
 		}
 	;
 

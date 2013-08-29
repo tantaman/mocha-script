@@ -23,5 +23,6 @@ propaccess                  \.[a-zA-Z$_][a-zA-Z0-9$_]*
 "<"							return 'MATHY';
 ">="						return 'MATHY';
 "<="						return 'MATHY';
+"/"							return 'MATHY';
 \s+                         /* skip whitespace */
 <<EOF>>						return 'ENDOFFILE';
