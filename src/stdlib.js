@@ -47,3 +47,7 @@ var uplus, utimes, identity;
 uplus = utimes = identity = function(l) { return l; };
 function uminus(l) { return -l; }
 function udivide(l) { return 1 / l; }
+
+for (var key in lodash) {
+	this[key] = lodash[key];
+}

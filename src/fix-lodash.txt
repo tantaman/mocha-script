@@ -1,0 +1,24 @@
+var lodash = require('./lodash');
+
+console.log(lodash);
+
+/*
+tofix:
+every (all)
+some (any)
+map (collect)
+countBy
+find (detect)
+reduce
+reduceRight
+reject
+filter
+sortBy
+where
+findKey
+// no forIn for foreach consistency
+// no forOwn for foreach consistency
+omit
+pick
+transform
+*/
