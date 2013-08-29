@@ -1,1 +1,2 @@
-jison grammar.jison tokens.jisonlex
+jison mochascriptParser.jison mochascriptLexer.jisonlex
+mv mochascriptParser.js ../dist

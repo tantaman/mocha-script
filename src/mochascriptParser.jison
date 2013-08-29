@@ -9,18 +9,39 @@ jison grammar.jison tokens.jisonlex
 		else
 			return a1;
 	}
+
+	function sexpStr(a1, a2) {
+		if (a2 != '')
+			return a1 + ";\n" + a2 + ";";
+		else
+			return a1 + ";\n";
+	}
 %}
 
 %%
 
 pgm
 	: sexplist ENDOFFILE
-		{console.log($1);}
+		{return "(function() {" + $1 + "})();";}
 	;
 
 sexplist
-	: sexp sexplist 
-		{$$ = $1 + "\n" + $2;}
+	: sexplisti
+		{
+			var list = $1;
+			list[list.length - 1] = "return " + list[list.length - 1];
+			$$ = list.join(";\n");
+		}
+	;
+
+sexplisti
+	: sexp sexplisti
+		{
+			if ($2 != '')
+				$$ = [$1].concat($2);
+			else
+				$$ = [$1];
+		}
 	|
 		{$$ = '';}
 	;

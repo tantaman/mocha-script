@@ -1,0 +1,43 @@
+<html>
+<head>
+	<title>MochaScript Sandbox</title>
+</head>
+<body>
+<textarea id="ms" style="width: 800px; height: 400px;">
+(+ 2 3)
+(= 3 3)
+(! x (= 3 3))
+(let (x 1 y 2)
+	(+ "123" 2)
+	(+ 3 1)
+)
+(map (fn (x) (* 2 x)) [1 2 3 4 5 6])
+(log (pluck [{name:'beet' organic:false} {name:'carrot' organic:true}] 'organic'))
+</textarea>
+
+	<br/>
+	<button id="generate">Generate</button>
+	<pre id="js">
+	</pre>
+
+	<button id="run">Run</button>
+	
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="../src/stdlib-dashlo.js"></script>
+	<script src="../src/stdlib.js"></script>
+	<script src="../dist/mochascriptParser.js"></script>
+	<script>
+		var $ms = $('#ms');
+		var $js = $('#js');
+
+		$("#generate").click(function() {
+			var result = mochascriptParser.parse($ms.val());
+			$js.text(result);
+		});
+
+		$("#run").click(function() {
+			eval($js.text());
+		});
+	</script>
+</body>
+</html>
