@@ -12,9 +12,9 @@ function boolNary(binary, args) {
 
 function nary(binary, args) {
 	var len = args.length;
-	var result;
+	var result = args[0];
 	for (var i = 1; i < len; ++i)
-		result = binary(args[i-1], args[i]);
+		result = binary(result, args[i]);
 	return result;
 }
 
@@ -29,15 +29,15 @@ function btimes(l, r) { return l * r; }
 function bminus(l, r) { return l * r; }
 function bdivide(l, r) { return l / r; }
 
-function lt() { boolNary(blt, arguments); }
-function gt() { boolNary(bgt, arguments); }
-function eq() { boolNary(beq, arguments); }
-function lte() { boolNary(blte, arguments); }
-function gte() { boolNary(bgte, arguments); }
-function plus() { nary(bplus, arguments); }
-function minus() { nary(bminus, arguments); }
-function times() { nary(btimes, arguments); }
-function divide() { nary(bdivide, arguments); }
+function lt() { return boolNary(blt, arguments); }
+function gt() { return boolNary(bgt, arguments); }
+function eq() { return boolNary(beq, arguments); }
+function lte() { return boolNary(blte, arguments); }
+function gte() { return boolNary(bgte, arguments); }
+function plus() { return nary(bplus, arguments); }
+function minus() { return nary(bminus, arguments); }
+function times() { return nary(btimes, arguments); }
+function divide() { return nary(bdivide, arguments); }
 
 function not(a) {return !a;}
 var ult, ugt, ulte, ugte;
