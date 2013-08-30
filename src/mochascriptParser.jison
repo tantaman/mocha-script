@@ -58,6 +58,10 @@ sexp
 		{$$ = $1;}
 	| sfn
 		{$$ = $1;}
+	| LPAREN sfn params RPAREN
+		{$$ = "(" + $2 + ")(" + $3 + ")"}
+	| LPAREN NEW id params RPAREN
+		{$$ = "new " + $3 + "(" + $4 + ")"}
 	| LPAREN id params RPAREN
 		{$$ = $2 + "(" + $3 + ")"}
 	| LPAREN mathy params RPAREN
@@ -74,7 +78,7 @@ sexp
 				fn = 'minus';
 				break;
 			case '*':
-				fn = 'times';
+				fn = 'mult';
 				break;
 			case '>':
 				fn = 'gt';

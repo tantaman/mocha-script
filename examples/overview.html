@@ -1,0 +1,256 @@
+<html>
+<head>
+	<link rel="stylesheet" type="txt/css" href="vendor/bootstrap/css/bootstrap.css" />
+	
+	<link rel="stylesheet" href="vendor/codemirror.css">
+	<style>
+	.CodeMirror {
+		background: #f8f8f8;
+		font-family: monospace;
+		margin-right: 10px;
+		float: left;
+		border: 1px solid rgba(0,0,0,0.8);
+		border-radius: 5px;
+
+		width: 480px;
+		height: 280px;
+	}
+	</style>
+	<title>Mocha-Script overview</title>
+</head>
+<body>
+	<div class="container">
+		<div class="page-header">
+			<h1>Mocha-Script <small>overview</small></h1>
+		</div>
+
+<!-- PANEL //-->
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">Declarations</h3>
+		  </div>
+		  <div class="panel-body">
+		  	<div class="codeDemo">
+<textarea class="ms">
+(def treats ["cookies" "candy" "ice cream"])
+(def date (.now Date))
+(def answer 42)
+(def double (fn (n) (* 2 n)))
+
+(def things
+	(+ "Today is: " date 
+	   " and the answer is " answer 
+	   " which doubled is " (double answer)))
+
+(alert things)
+</textarea>
+				<textarea class="js"></textarea>
+			    <div class="run btn btn-success">Compile & Run</div>
+			</div>
+		  </div>
+		</div>
+<!-- END PANEL //-->
+
+<!-- PANEL //-->
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">Functions</h3>
+		  </div>
+		  <div class="panel-body">
+		  	<div class="codeDemo">
+<textarea class="ms">
+; define a function and save it in the variable "sqaure"
+(def square (fn (n) (* n n)))
+
+; call a function
+(square 8)
+
+; create and call an anonymous function
+((fn (n) (* n n)) 2)
+
+; alert the cubes
+(alert (map (fn (n) (* n n n)) [2 4 6 8]))
+</textarea>
+				<textarea class="js"></textarea>
+			    <div class="run btn btn-success">Compile & Run</div>
+			</div>
+		  </div>
+		</div>
+<!-- END PANEL //-->
+
+
+<!-- PANEL //-->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Objects</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+; define an object
+(def arnold {
+		name:{first:"Arnold" last:"Schwarzenegger"}
+		age:(- (.getFullYear (new Date)) 1947)
+		occupation:"badass"
+		greet:(fn () "Hello")
+	})
+
+; reference a field in an object
+(:age arnold)
+
+; call a method of an object
+(.greet arnold)
+
+; alert age
+(alert (:age arnold))
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile & Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL //-->
+
+<!-- PANEL //-->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Arrays / Objects continued</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+; define an array
+(def movies ["Freddy got Fingered"
+			 "Road Trip"
+			 "Stealing Harvard"
+			 "Bob the Butler"])
+
+; get an element
+(get movies 0)
+
+; define an object with custom keys
+(def obj {"goofy key": "value"})
+
+; get a custom field
+(get obj "goofy key")
+
+; alert field
+(alert (get movies 2))
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile & Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL //-->
+
+<!-- PANEL //-->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">JS Interop</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+; get the latest answers on Stack Overflow
+; and alert the author's names
+(def api "http://api.stackexchange.com/2.1/answers?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&order=desc&sort=activity&filter=default")
+
+(.get $ api
+	(fn (data)
+    	(alert (pluck 
+        (pluck (:items data) 'owner') 'display_name'))))
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile & Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL //-->
+
+<!-- PANEL //-->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Looping and Branching</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+(if (> 2 1)
+	(alert "2 is greater than 1") ; if true case
+	(alert "2 is less than 1?")) ; else case
+
+(def result (if true "true" "false"))
+(alert result)
+
+; TODO: document "looping".
+; currently map, each, foreach, times, some and other methods are provided
+(times 6 (fn () (log "hello"))) ; log hello 6 times
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile & Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL //-->
+
+<!-- PANEL //-->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Standard Library</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+; map
+; pluck
+; reduce
+; foldr
+; concat
+; zip
+; find
+; every
+; each
+; shuffle
+; times
+; where .... TODO TODOCUMENT
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile & Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL //-->
+
+	</div>
+
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="vendor/codemirror.js"></script>
+	<script src="vendor/modes/clojure.js"></script>
+	<script src="vendor/modes/javascript.js"></script>
+	<script src="vendor/jsbeautify.js"></script>
+
+	<script src="../src/stdlib-dashlo.js"></script>
+	<script src="../src/stdlib.js"></script>
+	<script src="../dist/mochascriptParser.js"></script>
+
+	<script>
+		var $demos = $('.codeDemo');
+		$demos.each(function() {
+			var $this = $(this);
+			var msMirror =
+				CodeMirror.fromTextArea($this.find('.ms')[0], {mode: 'text/x-clojure'});
+			var jsMirror =
+				CodeMirror.fromTextArea($this.find('.js')[0], {mode: 'javascript'});
+
+			var $run = $this.find('.run');
+			$run.click(function() {
+				var result = mochascriptParser.parse(msMirror.getValue());
+				result = js_beautify(result);
+				jsMirror.setValue(result);
+				eval(result);
+			});
+		});
+	</script>
+</body>
+</html>

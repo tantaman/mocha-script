@@ -25,8 +25,7 @@ function blte(l, r) { return l <= r; }
 function bgte(l, r) { return l >= r; }
 function bplus(l, r) { return l + r; }
 function bminus(l, r) { return l - r; }
-function btimes(l, r) { return l * r; }
-function bminus(l, r) { return l * r; }
+function bmult(l, r) { return l * r; }
 function bdivide(l, r) { return l / r; }
 
 function lt() { return boolNary(blt, arguments); }
@@ -36,15 +35,15 @@ function lte() { return boolNary(blte, arguments); }
 function gte() { return boolNary(bgte, arguments); }
 function plus() { return nary(bplus, arguments); }
 function minus() { return nary(bminus, arguments); }
-function times() { return nary(btimes, arguments); }
+function mult() { return nary(bmult, arguments); }
 function divide() { return nary(bdivide, arguments); }
 
 function not(a) {return !a;}
 var ult, ugt, ulte, ugte;
 ult = ugt = ulte = ugte = function() {return true;};
 
-var uplus, utimes, identity;
-uplus = utimes = identity = function(l) { return l; };
+var uplus, umult, identity;
+uplus = umult = identity = function(l) { return l; };
 function uminus(l) { return -l; }
 function udivide(l) { return 1 / l; }
 
@@ -57,3 +56,4 @@ function log() {
 }
 
 function foreach(arr, fn) { arr.forEach(fn); }
+function get(vec, key) {return vec[key];}
