@@ -1,6 +1,7 @@
 number                      [-]?[0-9]*\.?[0-9]+
 id                          [a-zA-Z$_][a-zA-Z0-9$_]*
-propaccess                  \.[a-zA-Z$_][a-zA-Z0-9$_]*
+mcall                  		\.[a-zA-Z$_][a-zA-Z0-9$_]*
+propaccess                  \:[a-zA-Z$_][a-zA-Z0-9$_]*
 
 %%
 ";".*                       /* ignore comments */
@@ -14,6 +15,7 @@ propaccess                  \.[a-zA-Z$_][a-zA-Z0-9$_]*
 "if"                        return 'IF';
 "switch"                    return 'SWITCH';
 "fn"                        return 'FN';
+{mcall}               		return 'MCALL';
 {propaccess}                return 'PROPACCESS';
 {id}                        return 'ID';
 ":"                         return 'COLON';

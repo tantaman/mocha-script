@@ -36,14 +36,9 @@ sexplist
 
 sexplisti
 	: sexp sexplisti
-		{
-			if ($2 != '')
-				$$ = [$1].concat($2);
-			else
-				$$ = [$1];
-		}
+		{$$ = [$1].concat($2);}
 	|
-		{$$ = '';}
+		{$$ = [];}
 	;
 
 sexp
@@ -56,6 +51,8 @@ sexp
 	| sset
 		{$$ = $1;}
 	| sprop
+		{$$ = $1;}
+	| smcall
 		{$$ = $1;}
 	| sfn
 		{$$ = $1;}
@@ -213,9 +210,14 @@ sset
 		{$$ = "(" + $3 + " = " + $4 + ")";}
 	;
 
+smcall
+	: LPAREN mcall exp params RPAREN
+		{$$ = "(" + $3 + ")" + $2 + "(" + $4 + ")";}
+	;
+
 sprop
 	: LPAREN propaccess exp RPAREN
-		{$$ = "(" + $3 + ")" + $2;}
+		{$$ = "(" + $3 + ")." + $2;}
 	;
 
 sfn
@@ -235,7 +237,12 @@ id
 		{$$ = yytext;}
 	;
 
+mcall
+	: MCALL
+		{$$ = yytext;}
+	;
+
 propaccess
 	: PROPACCESS
-		{$$ = yytext;}
+		{$$ = yytext.substring(1);}
 	;

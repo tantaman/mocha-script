@@ -1,22 +1,27 @@
 <html>
 <head>
 	<title>MochaScript Sandbox</title>
+	<style>
+		#js {
+			float: left;
+		}
+
+		#ms {
+			float: left;
+		}
+	</style>
 </head>
 <body>
 <textarea id="ms" style="width: 800px; height: 400px;">
-(+ 2 3)
-(= 3 3)
-(! x (= 3 3))
-(let (x 1 y 2)
-	(+ "123" 2)
-	(+ 3 1)
-)
-(map (fn (x) (* 2 x)) [1 2 3 4 5 6])
-(log (pluck [{name:'beet' organic:false} {name:'carrot' organic:true}] 'organic'))
-</textarea>
+(! sayhi (fn (name) (log "hello " name)))
 
-	<br/>
-	<button id="generate">Generate</button>
+(! api "http://api.stackexchange.com/2.1/answers?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&order=desc&sort=activity&filter=default")
+
+(sayhi "explorer")
+
+(.get $ api (fn (data)
+              (log (pluck (pluck (:items data) 'owner') 'display_name'))))
+</textarea>
 	<pre id="js">
 	</pre>
 
@@ -30,13 +35,16 @@
 		var $ms = $('#ms');
 		var $js = $('#js');
 
-		$("#generate").click(function() {
+		$("#generate").click(generate);
+
+		function generate() {
 			var result = mochascriptParser.parse($ms.val());
 			$js.text(result);
-		});
+			return result;
+		}
 
 		$("#run").click(function() {
-			eval($js.text());
+			eval(generate());
 		});
 	</script>
 </body>
