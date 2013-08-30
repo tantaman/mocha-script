@@ -55,3 +55,5 @@ for (var key in _) {
 function log() {
 	console.log.apply(console, arguments);
 }
+
+function foreach(fn, arr) { arr.forEach(fn); }

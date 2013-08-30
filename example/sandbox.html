@@ -3,11 +3,14 @@
 	<title>MochaScript Sandbox</title>
 	<style>
 		#js {
-			float: left;
 		}
 
 		#ms {
 			float: left;
+		}
+
+		#output {
+			margin-top: 30px;
 		}
 	</style>
 </head>
@@ -27,6 +30,11 @@
 
 	<button id="run">Run</button>
 	
+	<div style="clear: both;"></div>
+	<div id="output">
+		
+	</div>
+
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 	<script src="../src/stdlib-dashlo.js"></script>
 	<script src="../src/stdlib.js"></script>
@@ -34,6 +42,7 @@
 	<script>
 		var $ms = $('#ms');
 		var $js = $('#js');
+		var $output = $('#output')
 
 		$("#generate").click(generate);
 
