@@ -1,0 +1,12 @@
+(! sayhi (fn (name) (log "hello " name)))
+
+(! api "http://api.stackexchange.com/2.1/answers?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&order=desc&sort=activity&filter=default")
+
+(sayhi "explorer")
+
+(! display (fn (data) 
+  (foreach (fn (name) (.append $output ($ '<p>name</p>'))) data)
+))
+
+(.get $ api (fn (data)
+              (display (pluck (pluck (:items data) 'owner') 'display_name'))))

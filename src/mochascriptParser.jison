@@ -54,6 +54,8 @@ sexp
 		{$$ = $1;}
 	| smcall
 		{$$ = $1;}
+	| sdef
+		{$$ = $1;}
 	| sfn
 		{$$ = $1;}
 	| LPAREN id params RPAREN
@@ -208,6 +210,11 @@ sset
 		{$$ = "(" + $3 + " = " + $4 + ")";}
 	| LPAREN SET sprop exp RPAREN
 		{$$ = "(" + $3 + " = " + $4 + ")";}
+	;
+
+sdef
+	: LPAREN DEF id exp RPAREN
+		{$$ = "var " + $3 + " = " + $4 + ";\n";}
 	;
 
 smcall

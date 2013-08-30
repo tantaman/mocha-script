@@ -56,4 +56,4 @@ function log() {
 	console.log.apply(console, arguments);
 }
 
-function foreach(fn, arr) { arr.forEach(fn); }
+function foreach(arr, fn) { arr.forEach(fn); }
