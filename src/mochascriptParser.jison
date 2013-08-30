@@ -204,7 +204,7 @@ sswitch
 
 caselist
 	: exp exp caselist
-		{$$ = "case " + $1 + ":\n\t" + __res = $2 + "break;\n" + $3;}
+		{$$ = "case " + $1 + ":\n\t" + (__res = $2) + "break;\n" + $3;}
 	|
 		{$$ = '';}
 	;

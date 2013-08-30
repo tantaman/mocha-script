@@ -207,7 +207,7 @@ case 39:this.$ = '';
 break;
 case 40:this.$ = "(function() {\n var __res; switch (" + $$[$0-2] + ") {\n" + $$[$0-1] + "\n}\n return __res;})()";
 break;
-case 41:this.$ = "case " + $$[$0-2] + ":\n\t" + __res = $$[$0-1] + "break;\n" + $$[$0];
+case 41:this.$ = "case " + $$[$0-2] + ":\n\t" + (__res = $$[$0-1]) + "break;\n" + $$[$0];
 break;
 case 42:this.$ = '';
 break;

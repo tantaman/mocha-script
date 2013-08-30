@@ -1,6 +1,8 @@
+<!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" type="txt/css" href="vendor/bootstrap/css/bootstrap.css" />
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+	<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css" />
 	
 	<link rel="stylesheet" href="vendor/codemirror.css">
 	<style>
@@ -24,7 +26,7 @@
 			<h1>Mocha-Script <small>overview</small></h1>
 		</div>
 
-<!-- PANEL //-->
+<!-- PANEL -->
 		<div class="panel panel-default">
 		  <div class="panel-heading">
 		    <h3 class="panel-title">Declarations</h3>
@@ -45,13 +47,13 @@
 (alert things)
 </textarea>
 				<textarea class="js"></textarea>
-			    <div class="run btn btn-success">Compile & Run</div>
+			    <div class="run btn btn-success">Compile &amp; Run</div>
 			</div>
 		  </div>
 		</div>
-<!-- END PANEL //-->
+<!-- END PANEL -->
 
-<!-- PANEL //-->
+<!-- PANEL -->
 		<div class="panel panel-default">
 		  <div class="panel-heading">
 		    <h3 class="panel-title">Functions</h3>
@@ -72,14 +74,14 @@
 (alert (map (fn (n) (* n n n)) [2 4 6 8]))
 </textarea>
 				<textarea class="js"></textarea>
-			    <div class="run btn btn-success">Compile & Run</div>
+			    <div class="run btn btn-success">Compile &amp; Run</div>
 			</div>
 		  </div>
 		</div>
-<!-- END PANEL //-->
+<!-- END PANEL -->
 
 
-<!-- PANEL //-->
+<!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
 	    <h3 class="panel-title">Objects</h3>
@@ -105,13 +107,13 @@
 (alert (:age arnold))
 </textarea>
 			<textarea class="js"></textarea>
-		    <div class="run btn btn-success">Compile & Run</div>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
 		</div>
 	  </div>
 	</div>
-<!-- END PANEL //-->
+<!-- END PANEL -->
 
-<!-- PANEL //-->
+<!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
 	    <h3 class="panel-title">Arrays / Objects continued</h3>
@@ -138,13 +140,13 @@
 (alert (get movies 2))
 </textarea>
 			<textarea class="js"></textarea>
-		    <div class="run btn btn-success">Compile & Run</div>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
 		</div>
 	  </div>
 	</div>
-<!-- END PANEL //-->
+<!-- END PANEL -->
 
-<!-- PANEL //-->
+<!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
 	    <h3 class="panel-title">JS Interop</h3>
@@ -162,13 +164,13 @@
         (pluck (:items data) 'owner') 'display_name'))))
 </textarea>
 			<textarea class="js"></textarea>
-		    <div class="run btn btn-success">Compile & Run</div>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
 		</div>
 	  </div>
 	</div>
-<!-- END PANEL //-->
+<!-- END PANEL -->
 
-<!-- PANEL //-->
+<!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
 	    <h3 class="panel-title">Looping and Branching</h3>
@@ -188,13 +190,13 @@
 (times 6 (fn () (log "hello"))) ; log hello 6 times
 </textarea>
 			<textarea class="js"></textarea>
-		    <div class="run btn btn-success">Compile & Run</div>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
 		</div>
 	  </div>
 	</div>
-<!-- END PANEL //-->
+<!-- END PANEL -->
 
-<!-- PANEL //-->
+<!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
 	    <h3 class="panel-title">Standard Library</h3>
@@ -216,11 +218,11 @@
 ; where .... TODO TODOCUMENT
 </textarea>
 			<textarea class="js"></textarea>
-		    <div class="run btn btn-success">Compile & Run</div>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
 		</div>
 	  </div>
 	</div>
-<!-- END PANEL //-->
+<!-- END PANEL -->
 
 	</div>
 
@@ -235,11 +237,15 @@
 	<script src="../dist/mochascriptParser.js"></script>
 
 	<script>
+	$(function() {
 		var $demos = $('.codeDemo');
-		$demos.each(function() {
+
+		$demos.each(function(i) {
 			var $this = $(this);
+			var $ms = $this.find('.ms');
 			var msMirror =
-				CodeMirror.fromTextArea($this.find('.ms')[0], {mode: 'text/x-clojure'});
+				CodeMirror.fromTextArea($ms[0], {mode: 'text/x-clojure'});
+			console.log(values[i]);
 			var jsMirror =
 				CodeMirror.fromTextArea($this.find('.js')[0], {mode: 'javascript'});
 
@@ -251,6 +257,7 @@
 				eval(result);
 			});
 		});
+	});
 	</script>
 </body>
 </html>
