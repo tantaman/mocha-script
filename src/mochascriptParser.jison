@@ -21,12 +21,12 @@ jison grammar.jison tokens.jisonlex
 %%
 
 pgm
-	: sexplist ENDOFFILE
+	: explist ENDOFFILE
 		{return "(function() {" + $1 + "})();";}
 	;
 
-sexplist
-	: sexplisti
+explist
+	: explisti
 		{
 			var list = $1;
 			list[list.length - 1] = "return " + list[list.length - 1];
@@ -34,8 +34,8 @@ sexplist
 		}
 	;
 
-sexplisti
-	: sexp sexplisti
+explisti
+	: exp explisti
 		{$$ = [$1].concat($2);}
 	|
 		{$$ = [];}
@@ -123,7 +123,7 @@ and other problems of JS scoping.
 This naive approach, while it'll get things working, isn't going to work
 in the long run.*/
 slet
-	: LPAREN LET LPAREN letparams RPAREN sexplist RPAREN
+	: LPAREN LET LPAREN letparams RPAREN explist RPAREN
 		{$$ = "(function() { " + $4 + "\n" + $6 + "\n})()";}
 	;
 
@@ -228,7 +228,7 @@ sprop
 	;
 
 sfn
-	: LPAREN FN LPAREN fnparams RPAREN sexplist RPAREN
+	: LPAREN FN LPAREN fnparams RPAREN explist RPAREN
 		{$$ = "\nfunction(" + $4 + ") {\n" + $6 + "\n}\n";}
 	;
 
