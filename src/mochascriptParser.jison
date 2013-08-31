@@ -3,18 +3,8 @@ jison grammar.jison tokens.jisonlex
 */
 
 %{
-	function paramStr(a1, a2) {
-		if (a2 != '')
-			return a1 + "," + a2;
-		else
-			return a1;
-	}
-
-	function sexpStr(a1, a2) {
-		if (a2 != '')
-			return a1 + ";\n" + a2 + ";";
-		else
-			return a1 + ";\n";
+	if (typeof module != 'undefined') {
+		var nodes = require('./nodes');
 	}
 %}
 
@@ -22,23 +12,19 @@ jison grammar.jison tokens.jisonlex
 
 pgm
 	: explist ENDOFFILE
-		{return "(function() {" + $1 + "})();";}
+		{return new GlobalScope($1).generate();}
 	;
 
 explist
 	: explisti
-		{
-			var list = $1;
-			list[list.length - 1] = "return " + list[list.length - 1];
-			$$ = list.join(";\n");
-		}
+		{$$ = $1;}
 	;
 
 explisti
 	: exp explisti
-		{$$ = [$1].concat($2);}
+		{$$ = new ExpList($1, $2);}
 	|
-		{$$ = [];}
+		{$$ = new ExpList();}
 	;
 
 sexp
@@ -59,66 +45,25 @@ sexp
 	| sfn
 		{$$ = $1;}
 	| LPAREN sfn params RPAREN
-		{$$ = "(" + $2 + ")(" + $3 + ")"}
+		{$$ = new LambdaCallSExp($2, $3)}
 	| LPAREN NEW id params RPAREN
-		{$$ = "new " + $3 + "(" + $4 + ")"}
+		{$$ = new NewSExp($3, $4);}
 	| LPAREN id params RPAREN
-		{$$ = $2 + "(" + $3 + ")"}
+		{$$ = new CallSExp($2, $3);}
 	| LPAREN mathy params RPAREN
-		{
-			var fn;
-			switch($2) {
-			case '=':
-				fn = 'eq';
-				break;
-			case '+':
-				fn = 'plus';
-				break;
-			case '-':
-				fn = 'minus';
-				break;
-			case '*':
-				fn = 'mult';
-				break;
-			case '>':
-				fn = 'gt';
-				break;
-			case '<':
-				fn = 'lt';
-				break;
-			case '>=':
-				fn = 'gte';
-				break;
-			case '<=':
-				fn = 'lte';
-				break;
-			case '/':
-				fn = 'divide';
-				break;
-			}
-
-			// TODO: another example of why we need to build a graph of nodes first.
-			var count = $params.split(",").length;
-			if (count == 2) {
-				$$ = 'b' + fn + "(" + $params + ")";
-			} else if(count == 1) {
-				$$ = 'u' + fn + "(" + $params + ")";
-			} else {
-				$$ = fn + ".call(null, " + $params + ")";
-			}
-		}
+		{$$ = new MathSExp($2, $3);}
 	;
 
 mathy
 	: MATHY
-		{$$ = $1}
+		{$$ = new Mathy($1);}
 	;
 
 params
 	: exp params
-		{$$ = paramStr($1, $2);}
+		{$$ = new Params($1, $2);}
 	|
-		{$$ = '';}
+		{$$ = new Params();}
 	;
 
 /*TODO: we are going to have to actually build up a graph of nodes
@@ -128,30 +73,30 @@ This naive approach, while it'll get things working, isn't going to work
 in the long run.*/
 slet
 	: LPAREN LET LPAREN letparams RPAREN explist RPAREN
-		{$$ = "(function() { " + $4 + "\n" + $6 + "\n})()";}
+		{$$ = new SLet($4, $6);}
 	;
 
 letparams
 	: id exp letparams
-		{$$ = "var " + $1 + " = " + $2 + ";\n" + $3;}
+		{$$ = new LetParams($1, $2, $3);}
 	|
-		{$$ = '';}
+		{$$ = new LetParams();}
 	;
 
 sif
 	: LPAREN IF exp exp RPAREN
-		{$$ = "(" + $3 + " ? " + $4 + " : null)\n";}
+		{$$ = new SIf($3, $4);}
 	| LPAREN IF exp exp exp RPAREN
-		{$$ = "(" + $3 + " ? " + $4 + " : " + $5 + ")\n";}
+		{$$ = new SIf($3, $4, $5);}
 	;
 
 exp
 	: id
 		{$$ = $1;}
 	| NUMBER
-		{$$ = yytext;}
+		{$$ = new Number(yytext);}
 	| STRING
-		{$$ = yytext;}
+		{$$ = new Str(yytext);}
 	| jsdata
 		{$$ = $1;}
 	| sexp
@@ -160,100 +105,99 @@ exp
 
 jsdata
 	: jsobject
-		{$$ = $1}
+		{$$ = $1;}
 	| jsarray
-		{$$ = $1}
+		{$$ = $1;}
 	;
 
 jsobject
 	: LCURLY jskeyvalpairs RCURLY
-		{$$ = "{" + $2 + "}"}
+		{$$ = new JSObject($2);}
 	;
 
 jskeyvalpairs
 	: jskey COLON exp jskeyvalpairs
-		{$$ = $1 + ":" + paramStr($3, $4);}
+		{$$ = new JSKeyValPairs($1, $3, $4);}
 	|
-		{$$ = '';}
+		{$$ = new JSKeyValPairs();}
 	;
 
 jskey
 	: id
-		{$$ = $1}
+		{$$ = new JSKey($1);}
 	| STRING
-		{$$ = yytext}
+		{$$ = jew JSKey(yytext);}
 	;
 
 jsarray
 	: LBRACKET jsarrayentries RBRACKET
-		{$$ = "[" + $2 + "]"}
+		{$$ = new JSArray($2);}
 	;
 
 jsarrayentries
 	: exp jsarrayentries
-		{$$ = paramStr($1, $2);}
+		{$$ = new JSArrayEntries($1, $2);}
 	|
-		{$$ = '';}
+		{$$ = new JSArrayEntries();}
 	;
 
-/*TODO: switch statements needs optimization.  This will kill us if they are run in a loop*/
 sswitch
 	: LPAREN SWITCH exp caselist RPAREN
-		{$$ = "(function() {\n var __res; switch (" + $3 + ") {\n" + $4 + "\n}\n return __res;})()";}
+		{$$ = new SSwitch($3, $4);}
 	;
 
 caselist
 	: exp exp caselist
-		{$$ = "case " + $1 + ":\n\t" + (__res = $2) + "break;\n" + $3;}
+		{$$ = new CaseList($1, $2, $3);}
 	|
-		{$$ = '';}
+		{$$ = new CaseList();}
 	;
 
 sset
 	: LPAREN SET id exp RPAREN
-		{$$ = "(" + $3 + " = " + $4 + ")";}
+		{$$ = new SSet($3, $4);}
 	| LPAREN SET sprop exp RPAREN
-		{$$ = "(" + $3 + " = " + $4 + ")";}
+		{$$ = new SSet($3, $4);}
 	;
 
 sdef
 	: LPAREN DEF id exp RPAREN
-		{$$ = "var " + $3 + " = " + $4 + ";\n";}
+		{$$ = new SDef($3, $4);}
 	;
 
 smcall
 	: LPAREN mcall exp params RPAREN
-		{$$ = "(" + $3 + ")" + $2 + "(" + $4 + ")";}
+		{$$ = new SMCall($3, $2, $4);}
 	;
 
 sprop
 	: LPAREN propaccess exp RPAREN
-		{$$ = "(" + $3 + ")." + $2;}
+		{$$ = new SProp($3, $2);}
 	;
 
 sfn
 	: LPAREN FN LPAREN fnparams RPAREN explist RPAREN
-		{$$ = "\nfunction(" + $4 + ") {\n" + $6 + "\n}\n";}
+		{$$ = new SFn($4, $6);}
 	;
 
 fnparams
 	: id fnparams
-		{$$ = paramStr($1, $2);}
+		{$$ = new FnParams($1, $2);}
 	|
-		{$$ = '';}
+		{$$ = new FnParams();}
 	;
 
 id
 	: ID
-		{$$ = yytext;}
+		{$$ = new Id(yytext);}
 	;
 
 mcall
 	: MCALL
-		{$$ = yytext;}
+		{$$ = new MCall(yytext);}
 	;
 
 propaccess
 	: PROPACCESS
-		{$$ = yytext.substring(1);}
+		{$$ = new PropAccess(yytext.substring(1));}
 	;
