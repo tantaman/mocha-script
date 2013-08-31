@@ -12,7 +12,7 @@ jison grammar.jison tokens.jisonlex
 
 pgm
 	: explist ENDOFFILE
-		{return new GlobalScope($1).generate();}
+		{return new GlobalScope($1).generate().toString();}
 	;
 
 explist
