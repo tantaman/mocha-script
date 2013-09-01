@@ -235,7 +235,6 @@ SMCall.prototype = {
 
 	generate: function(scope) {
 		this.expression = this.expression.generate(scope);
-		this.parameters.generate(scope);
 		return this;
 	}
 };
@@ -243,4 +242,87 @@ SMCall.prototype = {
 function SDef(id, expression) {
 	this.id = id;
 	this.expression = expression;
+}
+SDef.prototype = {
+	toString: function() {
+		return this.id + " = " + this.expression + ";";
+	},
+
+	generate: function(scope) {
+		scope.defineSymbol(this.id);
+		this.expression = this.expression.generate(scope);
+		return this;
+	}
+}
+
+function SSet(id, expression) {
+	this.id = id;
+	this.expression = expression;
+}
+SSet.prototype = {
+	toString: function() {
+		return "(" + this.id + " = " + this.expression + ")";
+	},
+
+	generate: function(scope) {
+		this.expression = this.expression.generate(scope);
+		return this;
+	}
+}
+
+function CaseList(check, expression, caselist) {
+	if (caselist) {
+		caselist.add(check, expression);
+		return caselist;
+	}
+
+	this.cases = [];
+	this.add(check, expression);
+}
+
+// TODO: cases are a new scope...
+// can't extract things outside of their case body!
+CaseList.prototype = {
+	add: function(check, expression) {
+		this.cases.push({check: check, expression: expression});
+	},
+
+	toString: function(caseSymbol) {
+		if (!caseSymbol)
+			throw "Illegal state.  Must have case symbol."
+
+		var result = "";
+		this.cases.forEach(function(kase) {
+			result += "case " + kase.check + ":\n";
+			result += caseSymbol + " = " + kase.expression;
+			result += "\nbreak;\n";
+		});
+
+		return result;
+	},
+
+	generate: function(scope) {
+		this.cases.forEach(funciton(kase) {
+			kase.check = kase.check.generate(scope);
+			kase.expression = kase.expression.generate(scope);
+		});
+
+		return this;
+	}
+};
+
+function SSwitch(expression, caselist) {
+	this.caselist = caselist;
+	this.expression = expression;
+}
+
+SSwitch.prototype = {
+	toString: function() {
+		var result = "";
+	},
+
+	generate: function(scope) {
+		var placeholder = scope.addExtractedFirst(this);
+		
+	}
 }
