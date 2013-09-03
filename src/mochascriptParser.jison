@@ -64,8 +64,8 @@ sexp
 		{$$ = $1;}
 	| srecur
 		{$$ = $1;}
-	| LPAREN sfn params RPAREN
-		{$$ = "(" + $2 + ")(" + $3 + ")"}
+	| LPAREN sexp params RPAREN
+		{$$ = "(" + $2 + ")(" + $3 + ")";}
 	| LPAREN NEW id params RPAREN
 		{$$ = "new " + $3 + "(" + $4 + ")"}
 	| LPAREN id params RPAREN
