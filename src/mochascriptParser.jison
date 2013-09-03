@@ -94,7 +94,7 @@ exp
 	: id
 		{$$ = $1;}
 	| NUMBER
-		{$$ = new Number(yytext);}
+		{$$ = new Num(yytext);}
 	| STRING
 		{$$ = new Str(yytext);}
 	| jsdata
@@ -126,7 +126,7 @@ jskey
 	: id
 		{$$ = new JSKey($1);}
 	| STRING
-		{$$ = jew JSKey(yytext);}
+		{$$ = new JSKey(new Str(yytext));}
 	;
 
 jsarray
