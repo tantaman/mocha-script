@@ -227,7 +227,7 @@ sset
 
 sdef
 	: LPAREN DEF id exp RPAREN
-		{$$ = "var " + $3 + " = " + $4 + ";\n";}
+		{$$ = "var " + $3 + " = " + $4 + "\n";}
 	;
 
 smcall
