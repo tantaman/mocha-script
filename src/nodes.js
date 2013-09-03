@@ -332,10 +332,99 @@ function SIf(condition, ifbody, elsebody) {
 
 SIf.prototype = {
 	toString: function() {
+		var result = "if (" + this.condition + ") {" + this.ifscope
+			+ "}";
 
+		if (this.elsescope) {
+			result += "else {" + this.elsescope + "}";
+		}
+
+		return result;
 	},
 
 	generate: function(scope, line) {
-		
+		var resultSymbol = scope.addExtractedFirst(this, line);
+
+		this.ifscope = new BranchScope(scope, this.ifbody, resultSymbol);
+		if (this.elsebody)
+			this.elsescope = new BranchScope(scope, this.elsebody, resultSymbol);
+
+		this.condition = this.condition.generate(scope, line);
+		this.ifscope.generate();
+
+		if (this.elsescope)
+			this.elsescope.generate();
+
+		return resultSymbol;
 	}
 };
+
+function LetParams(id, expression, letparams) {
+	if (letparams) {
+		letparams.add(id, expression);
+		return letparams;
+	}
+	this.bindings = [];
+	this.add(id, expression);
+}
+
+LetParams.prototype = {
+	add: function(id, expression) {
+		this.bindings.unshift({id: id, expression: expression});
+	},
+
+	toString: function() {
+		var result = "";
+		this.bindings.forEach(function(binding) {
+			result += binding.id + " = " + binding.expression + ";";
+		});
+
+		return result;
+	},
+
+	generate: function(scope, line) {
+		for(var i = this.bindings.length; i > -1; --i) {
+			thins.bindings[i].id = scope.defineSymbol(this.bindings[i].id);
+			this.bindings[i].expression = this.bindings[i].expression.generate(scope, line);
+		}
+
+		return this;
+	}
+};
+
+function SLet(letparams, expressions) {
+	this.letparams = letparams;
+	this.expressions = expressions;
+}
+
+SLet.prototype = {
+	toString: function() {
+		return this.scope.toString();
+	},
+
+	generate: function(scope, line) {
+		this.scope = new LetScope(scope, this.expressions, this.letparams);
+		var result = scope.addExtractedFirst(this.scope);
+		this.scope.generate();
+
+		return result;
+	}
+};
+
+function Params(expression, params) {
+	if (params) {
+		params.add(expression);
+		return params;
+	}
+
+	this.params = [];
+	this.add(expression);
+}
+
+Params.prototype = {
+	
+}
+
+
+// TODO: going to have to get really smart about boolean operators
+// to ensure that short-circuiting keeps working under these extraction circumstances

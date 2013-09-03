@@ -43,18 +43,6 @@ Scope.prototype = {
 	},
 
 	generate: function() {
-		// call generate on all sub-expressions
-		// those will extract epxressions and hopefully generate those as well
-		// then toString all expressions and extracted expressions?
-
-		// We need to get the ordering of extracted expressions correct.
-		// Some may come after a given subexpression...
-		// The extract expressions should be inserted just before their "from" expression
-
-		// so we'll call generate on everyone
-		// and then concatenate all of our code up by to-stringing everything...
-		// generate extracts expressions and re-orders code
-		// toString takes the results of generate and stringifies it.
 		this.expressions.forEach(function(expression) {
 			expression.generate(this);
 		});
@@ -147,3 +135,9 @@ GlobalScope.prototype = Object.create(Scope.prototype);
 function DoScope() {
 
 }
+
+function BranchScope(parentScope, bodyExpression, resultSymbol) {
+	Scope.call(this, parentScope, [bodyExpression]);
+	this.resultSymbol = resultSymbol;
+}
+BranchScope.prototype = Object.create(Scope.prototype);
