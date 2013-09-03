@@ -11,6 +11,7 @@ propaccess                  \:[a-zA-Z$_][a-zA-Z0-9$_]*
 \"[^"]*\"                   return 'STRING';
 \'[^']*\'                   return 'STRING';
 {number}                    return 'NUMBER';
+"not"						return 'MATHY';
 "new"						return 'NEW';
 "def"						return 'DEF';
 "let"                       return 'LET';

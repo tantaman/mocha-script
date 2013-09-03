@@ -67,9 +67,12 @@ sexp
 	| LPAREN mathy params RPAREN
 		{
 			var fn;
+			var binaryRep = $2;
+			var unaryRep;
 			switch($2) {
 			case '=':
 				fn = 'eq';
+				binaryRep = '===';
 				break;
 			case '+':
 				fn = 'plus';
@@ -95,16 +98,22 @@ sexp
 			case '/':
 				fn = 'divide';
 				break;
+			case 'not':
+				unaryRep = '!';
+				break;
 			}
 
 			// TODO: another example of why we need to build a graph of nodes first.
-			var count = $params.split(",").length;
-			if (count == 2) {
-				$$ = 'b' + fn + "(" + $params + ")";
+			var split = $3.split(",");
+			var count = split.length;
+			if (unaryRep) {
+				$$ = unaryRep + $3[0];
+			} else if (count == 2) {
+				$$ = '(' + split[0] + binaryRep + split[1] + ')';
 			} else if(count == 1) {
-				$$ = 'u' + fn + "(" + $params + ")";
+				$$ = 'u' + fn + "(" + $3 + ")";
 			} else {
-				$$ = fn + ".call(null, " + $params + ")";
+				$$ = fn + ".call(null, " + $3 + ")";
 			}
 		}
 	;
