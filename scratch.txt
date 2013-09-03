@@ -1,3 +1,9 @@
+todo: macro handling
+todo: defn, doto, list comprehensions
+todo: namespaces, imports, exports
+todo: 
+
+
 (! sayhi (fn (name) (log "hello " name)))
 
 (! api "http://api.stackexchange.com/2.1/answers?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&order=desc&sort=activity&filter=default")
@@ -10,3 +16,4 @@
 
 (.get $ api (fn (data)
               (display (pluck (pluck (:items data) 'owner') 'display_name'))))
+

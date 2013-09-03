@@ -185,9 +185,14 @@
 (def result (if true "true" "false"))
 (alert result)
 
-; TODO: document "looping".
 ; currently map, each, foreach, times, some and other methods are provided
 (times 6 (fn () (log "hello"))) ; log hello 6 times
+
+(log (loop (z 1)
+     (log z)
+     (if (< z 10)
+       (recur z (+ z 1)))
+))
 </textarea>
 			<textarea class="js"></textarea>
 		    <div class="run btn btn-success">Compile &amp; Run</div>

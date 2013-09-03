@@ -1,5 +1,7 @@
 /*
 jison grammar.jison tokens.jisonlex 
+// TODO: Call a backend that can generate any language
+// instead of genreating javascript directly in the parser.
 */
 
 %{
@@ -57,6 +59,10 @@ sexp
 	| sdef
 		{$$ = $1;}
 	| sfn
+		{$$ = $1;}
+	| sloop
+		{$$ = $1;}
+	| srecur
 		{$$ = $1;}
 	| LPAREN sfn params RPAREN
 		{$$ = "(" + $2 + ")(" + $3 + ")"}
@@ -130,11 +136,36 @@ params
 		{$$ = '';}
 	;
 
-/*TODO: we are going to have to actually build up a graph of nodes
-so we can do lets efficiently and correclty handle variable hoisting
-and other problems of JS scoping.
-This naive approach, while it'll get things working, isn't going to work
-in the long run.*/
+sloop
+	: LPAREN LOOP LPAREN letparams RPAREN explisti RPAREN
+		{
+		var lastExp = $6[$6.length-1];
+		if (lastExp.indexOf("recur"))
+		$6[$6.length-1] = "__loopResult = " + lastExp;
+		$6 = $6.join("\n;");
+		$$ = "(function() { var __looping, __loopResult; "
+		+ $4 + "\n"
+		+ "do { "
+		+ "__looping = false;\n"
+		+ $6 
+		+ "} while(__looping);\n"
+		+ "return __loopResult;})()"}
+	;
+
+srecur
+	: LPAREN RECUR recurparams RPAREN
+		{$$ = "(__looping = true) && false";
+		if ($3 != '') $$ += " || " + $3;}
+	;
+
+recurparams
+	: id exp recurparams
+		{$$ = "(" + $1 + " = " + $2 + ") && false";
+		if ($3 != '') $$ += " || " + $3;}
+	|
+		{$$ = '';}
+	;
+
 slet
 	: LPAREN LET LPAREN letparams RPAREN explist RPAREN
 		{$$ = "(function() { " + $4 + "\n" + $6 + "\n})()";}
@@ -205,7 +236,8 @@ jsarrayentries
 		{$$ = '';}
 	;
 
-/*TODO: switch statements needs optimization.  This will kill us if they are run in a loop*/
+/* Browsers appear to optimize out inline function def and calls so this
+isn't a performance issue. */
 sswitch
 	: LPAREN SWITCH exp caselist RPAREN
 		{$$ = "(function() {\n var __res; switch (" + $3 + ") {\n" + $4 + "\n}\n return __res;})()";}

@@ -18,6 +18,8 @@ propaccess                  \:[a-zA-Z$_][a-zA-Z0-9$_]*
 "if"                        return 'IF';
 "switch"                    return 'SWITCH';
 "fn"                        return 'FN';
+"loop"						return 'LOOP';
+"recur"						return 'RECUR';
 {mcall}               		return 'MCALL';
 {propaccess}                return 'PROPACCESS';
 {id}                        return 'ID';
