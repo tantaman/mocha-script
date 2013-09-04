@@ -112,7 +112,7 @@ macros.type = function(list, userdata) {
 };
 
 macros.deftype = function(list, userdata) {
-	return process([Node('def'), list[1], Node('fncall', 'type')].concat(rest(list, 1)));
+	return process([Node('def'), list[1], [Node('fncall', 'type')].concat(rest(list, 1))]);
 };
 function process(list, userdata) {
 	if (!list) return null;

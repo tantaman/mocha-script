@@ -72,6 +72,9 @@
 
 ; alert the cubes
 (alert (map (fn (n) (* n n n)) [2 4 6 8]))
+
+; shortcut function definition
+(defn shorter (n) (* n n))
 </textarea>
 				<textarea class="js"></textarea>
 			    <div class="run btn btn-success">Compile &amp; Run</div>
@@ -89,7 +92,7 @@
 	  <div class="panel-body">
 	  	<div class="codeDemo">
 <textarea class="ms">
-; define an object
+; define an object literal
 (def arnold {
 		name:{first:"Arnold" last:"Schwarzenegger"}
 		age:(- (.getFullYear (new Date)) 1947)
@@ -107,6 +110,9 @@
 
 ; alert age
 (alert (:age arnold))
+
+; anonymous object literal
+(log {first:1 second:2})
 
 </textarea>
 			<textarea class="js"></textarea>
@@ -186,16 +192,59 @@
 	(alert "2 is less than 1?")) ; else case
 
 (def result (if true "true" "false"))
-(alert result)
 
-; currently map, each, foreach, times, some and other methods are provided
 (times 6 (fn () (log "hello"))) ; log hello 6 times
 
 (log (loop (z 1)
-     (log z)
-     (if (< z 10)
+     (when (< z 5)
+       (log z)
        (recur (+ z 1)))
 ))
+
+(foreach [1 2 3 4] log)
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL -->
+
+<!-- PANEL -->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Types, Inheritance, Mixins</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+; define a type
+(deftype Animal
+	(eat (food) (log food))
+	(sleep (duration) (setTimeout (fn () (log "ate")) duration))
+)
+
+; define a type that inherits from another
+(deftype Tiger {extend: (:prototype Animal)}
+	(prowl () (alert "prowling"))
+)
+
+; define a type as an expression that can be passed and/or saved
+(def Lion (type Lion {extend: (:prototype Animal)}
+	(roar () (alert "ROAR!!!"))
+))
+
+; define a type that mixins in other types
+(deftype Liger {
+	extend: (:prototype Animal)
+	mix: [(:prototype Lion) (:prototype Tiger)]}
+)
+
+
+(let (liger (new Liger))
+	(.roar liger)
+	(.prowl liger)
+)
 </textarea>
 			<textarea class="js"></textarea>
 		    <div class="run btn btn-success">Compile &amp; Run</div>
