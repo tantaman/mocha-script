@@ -233,7 +233,7 @@ processors.refprop = function(list, userdata) {
 };
 
 processors.def = function(list, userdata) {
-	return "var " + list[1] + " = " + process(rest(list, 2), userdata) + "\n";
+	return "var " + list[1] + " = " + process(list[2], userdata) + "\n";
 };
 
 processors.mcall = function(list, userdata) {

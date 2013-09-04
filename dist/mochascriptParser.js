@@ -44,14 +44,14 @@ macros.defn = function(list, userdata) {
 * (when exp body) -> (if exp (do body))
 */
 macros.when = function(list, userdata) {
-	return process([Node('if'), list[1], [Node('do')].concat(rest(list, 2))]);
+	return process([Node('if'), list[1], [Node('do')].concat(rest(list, 2))], userdata);
 };
 
 /**
 * (do body) -> ((fn () body))
 */
 macros.do = function(list, userdata) {
-	return process([[Node('fn'), []].concat(rest(list, 1))]);
+	return process([[Node('fn'), []].concat(rest(list, 1))], userdata);
 };
 
 // TODO: convert to a list of existing symbols instead of generating the JS
@@ -349,7 +349,7 @@ processors.refprop = function(list, userdata) {
 };
 
 processors.def = function(list, userdata) {
-	return "var " + list[1] + " = " + process(rest(list, 2), userdata) + "\n";
+	return "var " + list[1] + " = " + process(list[2], userdata) + "\n";
 };
 
 processors.mcall = function(list, userdata) {
