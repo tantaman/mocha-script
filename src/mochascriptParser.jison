@@ -37,6 +37,8 @@ sexp
 		{$$ = $1;}
 	| srecur
 		{$$ = $1;}
+	| LPAREN RPAREN
+		{$$ = []}
 	| LPAREN sexp params RPAREN
 		{$$ = [$2].concat($3);}
 	| LPAREN NEW id params RPAREN

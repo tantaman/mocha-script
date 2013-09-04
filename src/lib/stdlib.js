@@ -57,3 +57,5 @@ function log() {
 
 function foreach(arr, fn) { arr.forEach(fn); }
 function get(vec, key) {return vec[key];}
+
+function isinstance(a, b) {return a instanceof b;}

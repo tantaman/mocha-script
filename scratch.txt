@@ -17,3 +17,8 @@ todo:
 (.get $ api (fn (data)
               (display (pluck (pluck (:items data) 'owner') 'display_name'))))
 
+(deftype name {extend: proto mix: [mixins]}
+	(methName (params...) body...)
+	...
+)
+
