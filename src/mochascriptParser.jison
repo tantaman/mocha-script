@@ -61,8 +61,7 @@ params
 
 sloop
 	: LPAREN LOOP LPAREN letparams RPAREN explisti RPAREN
-		{$$ = [Node('loop'), $4];
-		$$.concat($6);}
+		{$$ = [Node('loop'), $4].concat($6);}
 	;
 
 srecur
