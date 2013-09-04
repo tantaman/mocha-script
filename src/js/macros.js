@@ -7,7 +7,7 @@ var macros = {};
 macros.defn = function(list, userdata) {
 	return process(
 		[Node('def'), list[1],
-			[Node('fn'), list[2]].concat(list[3])], userdata);
+			[Node('fn'), list[2]].concat(rest(list, 3))], userdata);
 };
 
 /**

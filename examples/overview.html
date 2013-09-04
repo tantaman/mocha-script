@@ -213,7 +213,7 @@
 <!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
-	    <h3 class="panel-title">Types, Inheritance, Mixins</h3>
+	    <h3 class="panel-title" id="types">Types, Inheritance, Mixins</h3>
 	  </div>
 	  <div class="panel-body">
 	  	<div class="codeDemo">
@@ -221,7 +221,7 @@
 ; define a type
 (deftype Animal
 	(eat (food) (log food))
-	(sleep (duration) (setTimeout (fn () (log "ate")) duration))
+	(sleep (duration) (setTimeout (fn () (log "slept")) duration))
 )
 
 ; define a type that inherits from another
@@ -234,7 +234,7 @@
 	(roar () (alert "ROAR!!!"))
 ))
 
-; define a type that mixins in other types
+; define a type that mixes in other types
 (deftype Liger {
 	extend: (:prototype Animal)
 	mix: [(:prototype Lion) (:prototype Tiger)]}
