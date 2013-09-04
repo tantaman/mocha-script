@@ -1,10 +1,25 @@
-function JsBackend() {
-
+function process(list, userdata) {
+	var processor = lookupProcessor(list);
+	if (!processor)
+		throw "Illegal state.  No processor for " + list;
+	return processor(list, userdata);
 }
 
-JsBackend.prototype = {
+function lookupProcessor(list) {
+	if (list instanceof Node)
+		return returnText;
 
-};
+	var lookup = list[0];
+	if (lookup instanceof Array) {
+		return processors.fncall;
+	}
+
+	var processor = macros[lookup.key];
+	if (processor) return processor;
+
+	processor = processors[lookup.type];
+	return processor;
+}
 
 function returnText(node) {
 	return node.text;
@@ -14,8 +29,8 @@ var processors = {
 	id: returnText,
 	string: returnText,
 	mathy: function(list) {
-		var op = list.first().text;
-		var params = list.rest();
+		var op = first(list).text;
+		var params = rest(list);
 		var fn;
 		var binaryRep = op;
 		var unaryRep;
@@ -57,11 +72,11 @@ var processors = {
 		if (unaryRep) {
 			return unaryRep + process(params[0]);
 		} else if (count == 2) {
-			$$ = '(' + process(params[0]) + binaryRep + process(params[1]) + ')';
+			return '(' + process(params[0]) + binaryRep + process(params[1]) + ')';
 		} else if(count == 1) {
-			return 'u' + fn + "(" + process(params) + ")";
+			return 'u' + fn + "(" + processors.parameters(params) + ")";
 		} else {
-			return fn + ".call(null, " + process(params) + ")";
+			return fn + ".call(null, " + processors.parameters(params) + ")";
 		}
 	}
 };
@@ -89,10 +104,10 @@ processors.if = function(list) {
 };
 
 processors.fncall = function(list) {
-	if (list[0] instanceof List) {
-		return "(" + process(list[0]) + ")(" + processors.parameters(list.rest()) + ")";
+	if (list[0] instanceof Array) {
+		return "(" + process(list[0]) + ")(" + processors.parameters(rest(list)) + ")";
 	} else {
-		return list[0] + "(" + processors.parameters(list.rest()) + ")";
+		return list[0] + "(" + processors.parameters(rest(list)) + ")";
 	}
 };
 
@@ -100,22 +115,24 @@ processors.let = function(list) {
 	return "(function() { " + 
 		processors.bindings(list[1]) + 
 		"\n" + 
-		processors.fnbody(list[2]) +
+		processors.fnbody(rest(list, 2)) +
 		"\n})()";
 };
 
 processors.new = function(list) {
-	return "new " + process(list[1]) + "(" + processors.parameters(list.rest(2))
+	return "new " + process(list[1]) + "(" + processors.parameters(rest(list, 2))
 			+ ")";
 };
 
 processors.parameters = function(list) {
 	var result = "";
-	boolean first = true;
+	var first = true;
 	list.forEach(function(item) {
 		if (first) first = false; else result += ",";
 		result += process(item);
 	});
+
+	return result;
 };
 
 processors.loop = function(list) {
@@ -123,7 +140,7 @@ processors.loop = function(list) {
 		+ processors.bindings(list[1]) + "\n"
 		+ "do { "
 		+ "__looping = false;\n"
-		+ processors.loopbody(list.rest(2), list[1])
+		+ processors.loopbody(rest(list, 2), list[1])
 		+ "} while(__looping);\n"
 		+ "return __loopResult;})()";
 };
@@ -150,7 +167,7 @@ processors.bindings = function(list) {
 processors.recur = function(list, bindings) {
 	var result = "(__looping = true) && false";
 	if (list[1]) {
-		result += processors.recurparams(list.rest(), bindings);
+		result += processors.recurparams(rest(list), bindings);
 	}
 
 	return result;
@@ -167,8 +184,8 @@ processors.recurparams = function(list, bindings) {
 
 processors.jsobject = function(list) {
 	var result = "{";
-	boolean first = true;
-	for (var i = 1; i < list.length; i += 2) {
+	var first = true;
+	for (var i = 2; i < list.length; i += 2) {
 		if (first) first = false; else result += ",";
 		result += list[i-1] + ":" + process(list[i]);
 	}
@@ -178,18 +195,19 @@ processors.jsobject = function(list) {
 
 processors.jsarray = function(list) {
 	var result = "[";
-	boolean first = true;
-	list.forEach(function(item) {
+	var first = true;
+	for (var i = 1; i < list.length; ++i) {
+		var item = list[i];
 		if (first) first = false; else result += ",";
 		result += process(item);
-	});
+	}
 
 	return result + "]";
 };
 
 processors.switch = function(list) {
 	var exp = list[1];
-	var caselist = list.rest(2);
+	var caselist = rest(list, 2);
 
 	var result = "(function() {\n var __res;";
 	result += "switch (" + process(exp) + ") {\n";
@@ -211,22 +229,22 @@ processors.refprop = function(list) {
 };
 
 processors.def = function(list) {
-	return "var " + list[1] + " = " + list[2] + "\n";
+	return "var " + list[1] + " = " + process(list[2]) + "\n";
 };
 
 processors.mcall = function(list) {
 	return "(" + process(list[2]) + ")." + list[1] + "("
-		 + processors.parameters(list[3]) + ")";
+		 + processors.parameters(rest(list, 3)) + ")";
 };
 
 // TODO: add default parameters
 processors.fn = function(list) {
 	return "function(" + processors.fnparams(list[1]) + ") {\n" +
-		processors.fnbody(list[2]) + "\n}\n";
+		processors.fnbody(rest(list, 2)) + "\n}\n";
 };
 
 processors.fnparams = function(list) {
-	boolean first = true;
+	var first = true;
 	var result = "";
 	list.forEach(function(item) {
 		if (first) first = false; else result += ",";

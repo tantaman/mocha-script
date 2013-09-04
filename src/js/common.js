@@ -1,43 +1,30 @@
 function Node(type, key, text) {
-	this.key = key;
-	this.text = text || key;
+	if (!(this instanceof Node))
+		return new Node(type, key, text);
+
 	this.type = type;
+	this.key = key || type;
+	this.text = text || key || type;
 }
 
 Node.prototype.toString = function() {
 	return this.text;
 };
 
-function List() {
-  var arr = [ ];
-  arr.push.apply(arr, arguments);
-  arr.__proto__ = List.prototype;
-  return arr;
-}
-List.prototype = new Array;
-List.prototype.last = function() {
-  return this[this.length - 1];
-};
-List.prototype.first = function() {
-	return this[0];
-};
-
-function process(list, userdata) {
-	var processor = lookupProcessor(list);
-	if (!processor)
-		throw "Illegal state.  No processor for " + list;
-	return processor(list, userdata);
+function first(arr) {
+	return arr[0];
 }
 
-function lookupProcessor(list) {
-	var lookup = list[0];
-	if (lookup instanceof List) {
-		return processors.fncall;
+function last(arr) {
+	return arr[arr.length - 1];	
+}
+
+function rest(arr, n) {
+	if (!n) n = 1;
+	var result = [];
+	for (var i = n; i < arr.length; ++i) {
+		result.push(arr[i]);
 	}
 
-	var processor = macros[lookup.key];
-	if (processor) return processor;
-
-	processor = processors[lookup.type];
-	return processor;
+	return result;
 }

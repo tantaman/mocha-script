@@ -1,39 +1,12 @@
 /*
 jison grammar.jison tokens.jisonlex 
-// TODO: Call a backend that can generate any language
-// instead of genreating javascript directly in the parser.
 */
-
-%{
-	function paramStr(a1, a2) {
-		if (a2 != '')
-			return a1 + "," + a2;
-		else
-			return a1;
-	}
-
-	function sexpStr(a1, a2) {
-		if (a2 != '')
-			return a1 + ";\n" + a2 + ";";
-		else
-			return a1 + ";\n";
-	}
-%}
 
 %%
 
 pgm
-	: explist ENDOFFILE
-		{return "(function() {" + $1 + "})();";}
-	;
-
-explist
-	: explisti
-		{
-			var list = $1;
-			list[list.length - 1] = "return " + list[list.length - 1];
-			$$ = list.join(";\n");
-		}
+	: explisti ENDOFFILE
+		{return processors.pgm($1)}
 	;
 
 explisti
@@ -65,132 +38,71 @@ sexp
 	| srecur
 		{$$ = $1;}
 	| LPAREN sexp params RPAREN
-		{$$ = "(" + $2 + ")(" + $3 + ")";}
+		{$$ = [$2].concat($3);}
 	| LPAREN NEW id params RPAREN
-		{$$ = "new " + $3 + "(" + $4 + ")"}
+		{$$ = [Node('new'), $3].concat($4);}
 	| LPAREN id params RPAREN
-		{$$ = $2 + "(" + $3 + ")"}
+		{$$ = [Node('fncall', $2.key)].concat($3);}
 	| LPAREN mathy params RPAREN
-		{
-			var fn;
-			var binaryRep = $2;
-			var unaryRep;
-			switch($2) {
-			case '=':
-				fn = 'eq';
-				binaryRep = '===';
-				break;
-			case '+':
-				fn = 'plus';
-				break;
-			case '-':
-				fn = 'minus';
-				break;
-			case '*':
-				fn = 'mult';
-				break;
-			case '>':
-				fn = 'gt';
-				break;
-			case '<':
-				fn = 'lt';
-				break;
-			case '>=':
-				fn = 'gte';
-				break;
-			case '<=':
-				fn = 'lte';
-				break;
-			case '/':
-				fn = 'divide';
-				break;
-			case 'not':
-				unaryRep = '!';
-				break;
-			}
-
-			// TODO: another example of why we need to build a graph of nodes first.
-			var split = $3.split(",");
-			var count = split.length;
-			if (unaryRep) {
-				$$ = unaryRep + $3[0];
-			} else if (count == 2) {
-				$$ = '(' + split[0] + binaryRep + split[1] + ')';
-			} else if(count == 1) {
-				$$ = 'u' + fn + "(" + $3 + ")";
-			} else {
-				$$ = fn + ".call(null, " + $3 + ")";
-			}
-		}
+		{$$ = [$2].concat($3);}
 	;
 
 mathy
 	: MATHY
-		{$$ = $1}
+		{$$ = Node('mathy', $1)}
 	;
 
 params
 	: exp params
-		{$$ = paramStr($1, $2);}
+		{$$ = [$1].concat($2);}
 	|
-		{$$ = '';}
+		{$$ = [];}
 	;
 
 sloop
 	: LPAREN LOOP LPAREN letparams RPAREN explisti RPAREN
-		{
-		var lastExp = $6[$6.length-1];
-		$6[$6.length-1] = "__loopResult = " + lastExp;
-		$6 = $6.join("\n;");
-		$$ = "(function() { var __looping, __loopResult; "
-		+ $4 + "\n"
-		+ "do { "
-		+ "__looping = false;\n"
-		+ $6 
-		+ "} while(__looping);\n"
-		+ "return __loopResult;})()"}
+		{$$ = [Node('loop'), $4];
+		$$.concat($6);}
 	;
 
 srecur
 	: LPAREN RECUR recurparams RPAREN
-		{$$ = "(__looping = true) && false";
-		if ($3 != '') $$ += " || " + $3;}
+		{$$ = [Node('recur')].concat($3);}
 	;
 
 recurparams
-	: id exp recurparams
-		{$$ = "(" + $1 + " = " + $2 + ") && false";
-		if ($3 != '') $$ += " || " + $3;}
+	: exp recurparams
+		{$$ = [$1].concat($2)}
 	|
-		{$$ = '';}
+		{$$ = []}
 	;
 
 slet
-	: LPAREN LET LPAREN letparams RPAREN explist RPAREN
-		{$$ = "(function() { " + $4 + "\n" + $6 + "\n})()";}
+	: LPAREN LET LPAREN letparams RPAREN explisti RPAREN
+		{$$ = [Node('let'), $4].concat($6);}
 	;
 
 letparams
 	: id exp letparams
-		{$$ = "var " + $1 + " = " + $2 + ";\n" + $3;}
+		{$$ = [$1, $2].concat($3);}
 	|
-		{$$ = '';}
+		{$$ = [];}
 	;
 
 sif
 	: LPAREN IF exp exp RPAREN
-		{$$ = "(" + $3 + " ? " + $4 + " : null)\n";}
+		{$$ = [Node('if'), $3, $4];}
 	| LPAREN IF exp exp exp RPAREN
-		{$$ = "(" + $3 + " ? " + $4 + " : " + $5 + ")\n";}
+		{$$ = [Node('if'), $3, $4, $5];}
 	;
 
 exp
 	: id
 		{$$ = $1;}
 	| NUMBER
-		{$$ = yytext;}
+		{$$ = Node('number', yytext);}
 	| STRING
-		{$$ = yytext;}
+		{$$ = Node('string', yytext);}
 	| jsdata
 		{$$ = $1;}
 	| sexp
@@ -206,92 +118,92 @@ jsdata
 
 jsobject
 	: LCURLY jskeyvalpairs RCURLY
-		{$$ = "{" + $2 + "}"}
+		{$$ = [Node('jsobject', '')].concat($2);}
 	;
 
 jskeyvalpairs
 	: jskey COLON exp jskeyvalpairs
-		{$$ = $1 + ":" + paramStr($3, $4);}
+		{$$ = [$1, $3].concat($4);}
 	|
-		{$$ = '';}
+		{$$ = [];}
 	;
 
 jskey
 	: id
-		{$$ = $1}
+		{$$ = $1;}
 	| STRING
-		{$$ = yytext}
+		{$$ = Node('string', yytext);}
 	;
 
 jsarray
 	: LBRACKET jsarrayentries RBRACKET
-		{$$ = "[" + $2 + "]"}
+		{$$ = [Node('jsarray', '')].concat($2);}
 	;
 
 jsarrayentries
 	: exp jsarrayentries
-		{$$ = paramStr($1, $2);}
+		{$$ = [$1].concat($2)}
 	|
-		{$$ = '';}
+		{$$ = [];}
 	;
 
 sswitch
 	: LPAREN SWITCH exp caselist RPAREN
-		{$$ = "(function() {\n var __res; switch (" + $3 + ") {\n" + $4 + "\n}\n return __res;})()";}
+		{$$ = [Node('switch'), exp].concat(caselist);}
 	;
 
 caselist
 	: exp exp caselist
-		{$$ = "case " + $1 + ":\n\t (__res = " + $2 + ") break;\n" + $3;}
+		{$$ = [exp, exp].concat(caselist);}
 	|
-		{$$ = '';}
+		{$$ = [];}
 	;
 
 sset
 	: LPAREN SET id exp RPAREN
-		{$$ = "(" + $3 + " = " + $4 + ")";}
+		{$$ = [Node('set'), $3, $4];}
 	| LPAREN SET sprop exp RPAREN
-		{$$ = "(" + $3 + " = " + $4 + ")";}
+		{$$ = [Node('set'), $3, $4];}
 	;
 
 sdef
 	: LPAREN DEF id exp RPAREN
-		{$$ = "var " + $3 + " = " + $4 + "\n";}
+		{$$ = [Node('def'), $3, $4];}
 	;
 
 smcall
 	: LPAREN mcall exp params RPAREN
-		{$$ = "(" + $3 + ")" + $2 + "(" + $4 + ")";}
+		{$$ = [Node('mcall', ''), $2, $3].concat($4);}
 	;
 
 sprop
 	: LPAREN propaccess exp RPAREN
-		{$$ = "(" + $3 + ")." + $2;}
+		{$$ = [Node('refprop', ''), $2, $3];}
 	;
 
 sfn
-	: LPAREN FN LPAREN fnparams RPAREN explist RPAREN
-		{$$ = "\nfunction(" + $4 + ") {\n" + $6 + "\n}\n";}
+	: LPAREN FN LPAREN fnparams RPAREN explisti RPAREN
+		{$$ = [Node('fn'), $4].concat($6);}
 	;
 
 fnparams
 	: id fnparams
-		{$$ = paramStr($1, $2);}
+		{$$ = [$1].concat($2);}
 	|
-		{$$ = '';}
+		{$$ = [];}
 	;
 
 id
 	: ID
-		{$$ = yytext;}
+		{$$ = Node('id', yytext);}
 	;
 
 mcall
 	: MCALL
-		{$$ = yytext;}
+		{$$ = Node('id', yytext.substring(1));}
 	;
 
 propaccess
 	: PROPACCESS
-		{$$ = yytext.substring(1);}
+		{$$ = Node('id', yytext.substring(1));}
 	;
