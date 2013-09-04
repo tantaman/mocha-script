@@ -40,6 +40,20 @@ macros.defn = function(list, userdata) {
 			[Node('fn'), list[2]].concat(list[3])], userdata);
 };
 
+/**
+* (when exp body) -> (if exp (do body))
+*/
+macros.when = function(list, userdata) {
+	return process([Node('if'), list[1], [Node('do')].concat(rest(list, 2))]);
+};
+
+/**
+* (do body) -> ((fn () body))
+*/
+macros.do = function(list, userdata) {
+	return process([[Node('fn'), []].concat(rest(list, 1))]);
+};
+
 // TODO: convert to a list of existing symbols instead of generating the JS
 macros.type = function(list, userdata) {
 	var result = "(function() { function " + list[1] + "(";
