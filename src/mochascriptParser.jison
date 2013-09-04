@@ -140,7 +140,6 @@ sloop
 	: LPAREN LOOP LPAREN letparams RPAREN explisti RPAREN
 		{
 		var lastExp = $6[$6.length-1];
-		if (lastExp.indexOf("recur"))
 		$6[$6.length-1] = "__loopResult = " + lastExp;
 		$6 = $6.join("\n;");
 		$$ = "(function() { var __looping, __loopResult; "
@@ -236,8 +235,6 @@ jsarrayentries
 		{$$ = '';}
 	;
 
-/* Browsers appear to optimize out inline function def and calls so this
-isn't a performance issue. */
 sswitch
 	: LPAREN SWITCH exp caselist RPAREN
 		{$$ = "(function() {\n var __res; switch (" + $3 + ") {\n" + $4 + "\n}\n return __res;})()";}
@@ -245,7 +242,7 @@ sswitch
 
 caselist
 	: exp exp caselist
-		{$$ = "case " + $1 + ":\n\t" + (__res = $2) + "break;\n" + $3;}
+		{$$ = "case " + $1 + ":\n\t (__res = " + $2 + ") break;\n" + $3;}
 	|
 		{$$ = '';}
 	;
