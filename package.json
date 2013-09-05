@@ -1,8 +1,8 @@
 {
   "name": "mocha-script",
   "version": "0.1.0",
-  "description": "Lisp with javascript interop",
-  "main": "index.js",
+  "description": "Lisp with Javascript interop",
+  "main": "dist/mochascriptParser.js",
   "directories": {
     "example": "examples",
     "test": "test"
