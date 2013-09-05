@@ -5,6 +5,10 @@ function process(list, userdata) {
 		throw "Illegal state.  No processor for " + list;
 	return processor(list, userdata);
 }
+if (oldprocess) {
+	process.argv = oldprocess.argv;
+	process.exit = oldprocess.exit;
+}
 
 function lookupProcessor(list) {
 	if (list instanceof Node)
