@@ -24,6 +24,25 @@ macros.do = function(list, userdata) {
 	return process([[Node('fn'), []].concat(rest(list, 1))], userdata);
 };
 
+/**
+* (obj (name (params...) body)) -> {key: (fn (params..) body)}
+*/
+macros.obj = function(list) {
+	var result = [Node('jsobject')];
+
+	for (var i = 1; i < list.length; ++i) {
+		var def = list[i];
+		if (list[i][1] instanceof Array) {
+			result.push(list[i][0]);
+			result.push([Node('fn'), list[i][1]].concat(rest(list[i], 2)));
+		} else {
+			
+		}
+	}
+
+	return process(result);
+};
+
 // TODO: convert to a list of existing symbols instead of generating the JS
 macros.type = function(list, userdata) {
 	var result = "(function() { function " + list[1] + "(";
