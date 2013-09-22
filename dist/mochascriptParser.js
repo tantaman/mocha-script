@@ -95,8 +95,37 @@ if (!Array.prototype.forEach) {
             }
         }
     };
-}// Not exactly macros at the moment
-var macros = {};
+}var macros = {};
+
+function wrapMacro(macro) {
+	return function(list) {
+		return process(macro(list));
+	}
+}
+
+/**
+* (defmacro name (list) body) -> (fn (list) body)
+* that gets evaled:
+* eval("var __tempMacro = " + process(list));
+* macros[name] = wrapMacro(__tempMacro); // after some sanity checks on the macro
+* wrapMacro just runs the macro and does a "return process(macroResult);"
+*/
+macros.defmacro = function(list, userdata) {
+	var name = list[1];
+	list = list.slice(0).splice(2);
+	list.unshift(Node('fn'));
+
+	eval("var __tempMacro = " + process(list));
+	if (name in macros)
+		console.error('Macro ' + name + ' is being re-defined');
+	macros[name] = wrapMacro(__tempMacro);
+
+	console.log(__tempMacro);
+	return '';
+};
+
+
+// Not exactly macros at the moment
 
 /**
 * (defn name (params...) body) -> (def x (fn (params...) body))
@@ -106,6 +135,7 @@ macros.defn = function(list, userdata) {
 		[Node('def'), list[1],
 			[Node('fn'), list[2]].concat(rest(list, 3))], userdata);
 };
+
 
 /**
 * (when exp body) -> (if exp (do body))
