@@ -13,14 +13,6 @@ function Node(type, key, text) {
 	this.text = text || key || type;
 }
 
-function quoteIfString(item) {
-  if (typeof item === 'string') {
-    item = item.replace(/"/g, '\\"');
-    return '"' + item + '"';
-  }
-  return item;
-}
-
 Node.prototype.toString = function() {
 	return this.text;
 };
@@ -31,6 +23,31 @@ Node.prototype.toConstructionString = function() {
 
   return "Node('" + this.type + "', " + key + ", "
         + text + ")";
+}
+
+function Refprop(type, key, text) {
+  if (!(this instanceof Refprop))
+    return new Refprop(type, key, text);
+
+  Node.call(this, type, key, text);
+}
+
+Refprop.prototype = Object.create(Node.prototype);
+Refprop.prototype.toString = function() {
+  return this.text.substring(1);
+}
+Refprop.prototype.toConstructionString = function() {
+  var key = quoteIfString(this.key);
+  var text = quoteIfString(this.text);
+  return "Refprop('" + this.type + "', " + key + ", " + text + ")";
+}
+
+function quoteIfString(item) {
+  if (typeof item === 'string') {
+    item = item.replace(/"/g, '\\"');
+    return '"' + item + '"';
+  }
+  return item;
 }
 
 function first(arr) {
@@ -137,7 +154,11 @@ macros.defmacro = function(list, userdata) {
 		console.error('Macro ' + name + ' is being re-defined');
 	macros[name] = wrapMacro(__tempMacro);
 
-	return '';
+	if (typeof dumpMacros != 'undefined' && dumpMacros === 'dumpMacros') {
+		return "macros['" + name + "'] = wrapMacro(" + str + ");\n";
+	} else {
+		return '';
+	}
 };
 
 // TODO: need to update the parser to allow naked keywords to occur in backtick forms.
@@ -275,6 +296,13 @@ macros.type = function(list, userdata) {
 macros.deftype = function(list, userdata) {
 	return process([Node('def'), list[1], [Node('fncall', 'type')].concat(rest(list, 1))]);
 };
+(function() {return macros['!!'] = wrapMacro(function(syms) {
+return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1),Node('id', "newValue", "newValue"),get(syms,3),Node('id', "oldValue", "oldValue"),[get(syms,2),Node('id', "obj", "obj")]],[Node('fncall', "!", "!"),[get(syms,2),Node('id', "obj", "obj")],Node('id', "newValue", "newValue")],[Node('fncall', "if", "if"),[Node('mathy', "not", "not"),[Node('mathy', "=", "="),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")]],[Node('fncall', "msdispatch.propChange", "msdispatch.propChange"),Node('id', "obj", "obj"),get(syms,2),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")]],Node('id', "newValue", "newValue")];
+
+}
+);
+;
+})();
 function process(list, userdata) {
 	if (!list) return null;
 	var processor = lookupProcessor(list);
@@ -311,7 +339,7 @@ function lookupProcessor(list) {
 }
 
 function returnText(node) {
-	return node.text;
+	return node.toString();
 }
 var processors = {
 	number: returnText,
@@ -421,7 +449,10 @@ processors.parameters = function(list, userdata) {
 	var first = true;
 	list.forEach(function(item) {
 		if (first) first = false; else result += ",";
-		result += process(item, userdata);
+		if (item.type == 'refprop')
+			result += '"' + item.toString() + '"';
+		else
+			result += process(item, userdata);
 	});
 
 	return result;
@@ -516,8 +547,9 @@ processors['!'] = function(list, userdata) {
 	return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
 };
 
+// TODO: allow refprop to work with string props?
 processors.refprop = function(list, userdata) {
-	return "(" + process(list[1], userdata) + ")." + list[0].toString().substring(1);
+	return "(" + process(list[1], userdata) + ")." + list[0].toString();
 };
 
 processors.def = function(list, userdata) {
@@ -690,7 +722,7 @@ case 28:this.$ = Node('id', yytext);
 break;
 case 29:this.$ = Node('mcall', yytext);
 break;
-case 30:this.$ = Node('refprop', yytext);
+case 30:this.$ = Refprop('refprop', yytext);
 break;
 }
 },
@@ -1212,7 +1244,7 @@ case 28:return 5;
 break;
 }
 },
-rules: [/^(?:;.*)/,/^(?:\()/,/^(?:\))/,/^(?:~)/,/^(?:`)/,/^(?:"[^"]*")/,/^(?:'[^']*')/,/^(?:([-]?[0-9]*\.?[0-9]+))/,/^(?:not\b)/,/^(?:(\.[a-zA-Z$_][a-zA-Z0-9$_]*))/,/^(?:(:[a-zA-Z$_][a-zA-Z0-9$_]*))/,/^(?:([a-zA-Z$_!][a-zA-Z0-9$_!]*))/,/^(?::)/,/^(?:,)/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:=)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:>)/,/^(?:<)/,/^(?:>=)/,/^(?:<=)/,/^(?:\/)/,/^(?:\s+)/,/^(?:$)/],
+rules: [/^(?:;.*)/,/^(?:\()/,/^(?:\))/,/^(?:~)/,/^(?:`)/,/^(?:"[^"]*")/,/^(?:'[^']*')/,/^(?:([-]?[0-9]*\.?[0-9]+))/,/^(?:not\b)/,/^(?:(\.[a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?:(:[a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?:([a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?::)/,/^(?:,)/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:=)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:>)/,/^(?:<)/,/^(?:>=)/,/^(?:<=)/,/^(?:\/)/,/^(?:\s+)/,/^(?:$)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],"inclusive":true}}
 };
 return lexer;

@@ -111,5 +111,5 @@ mcall
 
 propaccess
 	: PROPACCESS
-		{$$ = Node('refprop', yytext);}
+		{$$ = Refprop('refprop', yytext);}
 	;

@@ -290,6 +290,33 @@
 <!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
+	    <h3 class="panel-title" id="events">Events <small>msdispatch</small></h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+(def arnold {age:1})
+
+; we can observe any property on any object by registering with msdispatch
+(msdispatch.on arnold :age (fn () (log arguments)))
+
+; setting a property on an object with !! will cause a change event to be fired
+(!! arnold :age 2)
+
+; setting a prop with one ! will be silent
+(! (:age arnold) 1)
+(! arnold.age 1)
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL -->
+
+<!-- PANEL -->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
 	    <h3 class="panel-title">Standard Library</h3>
 	  </div>
 	  <div class="panel-body">
@@ -317,15 +344,19 @@
 
 	</div>
 
+	<!-- includes just for the overview -->
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 	<script src="vendor/codemirror.js"></script>
 	<script src="vendor/modes/clojure.js"></script>
 	<script src="vendor/modes/javascript.js"></script>
 	<script src="vendor/jsbeautify.js"></script>
 
+	<!-- actual mocha script includes -->
 	<script src="../dist/stdlib-dashlo.js"></script>
 	<script src="../dist/stdlib.js"></script>
 	<script src="../dist/mochascriptParser.js"></script>
+	<!-- optional bacon include -->
+	<script src="../dist/bacon.js"></script>
 
 	<script>
 	$(function() {

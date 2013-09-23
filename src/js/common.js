@@ -7,14 +7,6 @@ function Node(type, key, text) {
 	this.text = text || key || type;
 }
 
-function quoteIfString(item) {
-  if (typeof item === 'string') {
-    item = item.replace(/"/g, '\\"');
-    return '"' + item + '"';
-  }
-  return item;
-}
-
 Node.prototype.toString = function() {
 	return this.text;
 };
@@ -25,6 +17,31 @@ Node.prototype.toConstructionString = function() {
 
   return "Node('" + this.type + "', " + key + ", "
         + text + ")";
+}
+
+function Refprop(type, key, text) {
+  if (!(this instanceof Refprop))
+    return new Refprop(type, key, text);
+
+  Node.call(this, type, key, text);
+}
+
+Refprop.prototype = Object.create(Node.prototype);
+Refprop.prototype.toString = function() {
+  return this.text.substring(1);
+}
+Refprop.prototype.toConstructionString = function() {
+  var key = quoteIfString(this.key);
+  var text = quoteIfString(this.text);
+  return "Refprop('" + this.type + "', " + key + ", " + text + ")";
+}
+
+function quoteIfString(item) {
+  if (typeof item === 'string') {
+    item = item.replace(/"/g, '\\"');
+    return '"' + item + '"';
+  }
+  return item;
 }
 
 function first(arr) {

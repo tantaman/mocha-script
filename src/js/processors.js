@@ -34,7 +34,7 @@ function lookupProcessor(list) {
 }
 
 function returnText(node) {
-	return node.text;
+	return node.toString();
 }
 var processors = {
 	number: returnText,
@@ -144,7 +144,10 @@ processors.parameters = function(list, userdata) {
 	var first = true;
 	list.forEach(function(item) {
 		if (first) first = false; else result += ",";
-		result += process(item, userdata);
+		if (item.type == 'refprop')
+			result += '"' + item.toString() + '"';
+		else
+			result += process(item, userdata);
 	});
 
 	return result;
@@ -239,8 +242,9 @@ processors['!'] = function(list, userdata) {
 	return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
 };
 
+// TODO: allow refprop to work with string props?
 processors.refprop = function(list, userdata) {
-	return "(" + process(list[1], userdata) + ")." + list[0].toString().substring(1);
+	return "(" + process(list[1], userdata) + ")." + list[0].toString();
 };
 
 processors.def = function(list, userdata) {

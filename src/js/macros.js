@@ -24,7 +24,11 @@ macros.defmacro = function(list, userdata) {
 		console.error('Macro ' + name + ' is being re-defined');
 	macros[name] = wrapMacro(__tempMacro);
 
-	return '';
+	if (typeof dumpMacros != 'undefined' && dumpMacros === 'dumpMacros') {
+		return "macros['" + name + "'] = wrapMacro(" + str + ");\n";
+	} else {
+		return '';
+	}
 };
 
 // TODO: need to update the parser to allow naked keywords to occur in backtick forms.
