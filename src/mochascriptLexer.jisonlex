@@ -9,6 +9,7 @@ propaccess                  \:[a-zA-Z$_][a-zA-Z0-9$_]*
 ")"                         return 'RPAREN';
 "!"                         return 'SET';
 "~"							return 'TILDE';
+"`"							return 'BACKTICK';
 \"[^"]*\"                   return 'STRING';
 \'[^']*\'                   return 'STRING';
 {number}                    return 'NUMBER';

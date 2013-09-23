@@ -28,93 +28,38 @@ macros.defmacro = function(list, userdata) {
 	return '';
 };
 
-/**
-Example of ` macro operator:
-
-Definition of a silly 'substract' macro:
-(defmacro subtract (syms) 
-  `(- ~(get syms 1) ~(get syms 2) (get x 3))
-)
-
-Expanding the inner '`' macro of the subtract macro:
-(defmacro subtract (syms)
-  [(Node 'mathy' '-') (get syms 1) (get syms 2) 
-  	[(Node 'fncall' 'get') (Node 'id' 'x') (Node 'number' 3)]]
-)
-
-
-(defmacro sub (syms) 
-	(testsub (- ~(get syms 1) ~(get syms 2) (get x 3)))
-)
-*/
-
-// Testing out the theory of the '`' expansion:
-macros.testsub = function(list, userdata) {
-	return process(
-		// (
-		[Node('jsarray', ''), 
-
-		// -
-		[Node('fncall', 'Node'), Node('string','"mathy"'),
-		Node('string', '"-"')], // ` items are WRAPPED / taken up one level of nodes.
-
-		// ~(get syms 1)
-		list[1][2], // ~ items are extracted directly.
-
-		// ~(get syms 2)
-		list[1][4],
-
-		// (get x 3)
-		// (
-		[Node('jsarray', ''),
-
-			// get
-			[Node('fncall', 'Node'),
-			Node('string', '"fncall"'),
-			Node('string', '"get"')],
-
-			// x
-			[Node('fncall', 'Node'),
-			Node('string', '"id"'),
-			Node('string', '"x"')],
-
-			// 3
-			[Node('fncall', 'Node'),
-			Node('string', '"number"'),
-			Node('number', 3)]
-		]]); // ~ parameters are simply EXTRACTED
+// TODO: need to update the parser to allow naked keywords to occur in backtick forms.
+macros['`'] = function(list, userdata) {
+	list = list[1];
+	return deepToConstructionString(list);
 }
 
-macros['bt'] = function(list, userdata) {
-	// unquoted things can be taken directly from the list
-	// quoted things are noded up...
+function deepToConstructionString(items) {
+	// TODO items may not necessarily be an array.
+	var result = '[';
+	var first = true;
 
-	// This definition needs to be recursive as we must nodeup items
-	// within noded up items.
-	var result = [Node('jsarray', '')];
-	var arg = list[1];
-	for (var i = 0; i < arg.length; ++i) {
-		var elem = arg[i];
-		if (!(elem instanceof Array) && elem.type == 'tilde') {
-			i += 1;
-			result.push(arg[i]);
+	for (var i = 0; i < items.length; ++i) {
+		var item = items[i];
+		if (first) first = false; else result += ',';
+
+		if (item instanceof Array) {
+			if (item[0].type == '~') {
+				result += process(item[1]);
+			} else {
+				result += deepToConstructionString(item);
+			}
 		} else {
-			result.push(nodeup(elem));
+			result += item.toConstructionString();
 		}
 	}
 
-	return result;
-};
-
-function nodeup(syms) {
-	// if syms is an array
-	// then we should call macros[bt] on it and return that result
-	// else, we node-it-up
+	return result + ']';
 }
 
 
-// Not exactly macros at the moment
 
+// Not exactly macros at the moment
 /**
 * (defn name (params...) body) -> (def x (fn (params...) body))
 */

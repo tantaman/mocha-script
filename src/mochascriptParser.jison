@@ -47,6 +47,8 @@ sexp
 		{$$ = [Node('fncall', $2.key)].concat($3);}
 	| LPAREN mathy params RPAREN
 		{$$ = [$2].concat($3);}
+	| LPAREN tilde RPAREN
+		{$$ = $1;}
 	;
 
 mathy
@@ -106,10 +108,24 @@ exp
 		{$$ = Node('string', yytext);}
 	| jsdata
 		{$$ = $1;}
-	| TILDE
-		{$$ = Node('tilde', yytext);}
+	| tilde
+		{$$ = $1;}
+	| backtick
+		{$$ = $1;}
 	| sexp
 		{$$ = $1;}
+	| mathy
+		{$$ = $1}
+	;
+
+tilde
+	: TILDE exp
+		{$$ = [Node('~', ''), $2];}
+	;
+
+backtick
+	: BACKTICK exp
+		{$$ = [Node('`'), $2];}
 	;
 
 jsdata

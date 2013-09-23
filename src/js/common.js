@@ -7,9 +7,21 @@ function Node(type, key, text) {
 	this.text = text || key || type;
 }
 
+function quoteIfString(item) {
+  if (typeof item === 'string') {
+    return '"' + item + '"';
+  }
+  return item;
+}
+
 Node.prototype.toString = function() {
 	return this.text;
 };
+
+Node.prototype.toConstructionString = function() {
+  return "Node('" + this.type + "', " + quoteIfString(this.key) + ", "
+        + quoteIfString(this.text) + ")";
+}
 
 function first(arr) {
 	return arr[0];
