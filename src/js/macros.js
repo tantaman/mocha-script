@@ -1,8 +1,8 @@
 var macros = {};
 
 function wrapMacro(macro) {
-	return function(list) {
-		return process(macro(list));
+	return function(list, userdata) {
+		return process(macro(list), userdata);
 	}
 }
 
@@ -18,14 +18,99 @@ macros.defmacro = function(list, userdata) {
 	list = list.slice(0).splice(2);
 	list.unshift(Node('fn'));
 
-	eval("var __tempMacro = " + process(list));
+	var str = process(list, userdata);
+	console.log(str);
+	eval("var __tempMacro = " + str);
 	if (name in macros)
 		console.error('Macro ' + name + ' is being re-defined');
 	macros[name] = wrapMacro(__tempMacro);
 
-	console.log(__tempMacro);
 	return '';
 };
+
+/**
+Example of ` macro operator:
+
+Definition of a silly 'substract' macro:
+(defmacro subtract (syms) 
+  `(- ~(get syms 1) ~(get syms 2) (get x 3))
+)
+
+Expanding the inner '`' macro of the subtract macro:
+(defmacro subtract (syms)
+  [(Node 'mathy' '-') (get syms 1) (get syms 2) 
+  	[(Node 'fncall' 'get') (Node 'id' 'x') (Node 'number' 3)]]
+)
+
+
+(defmacro sub (syms) 
+	(testsub (- ~(get syms 1) ~(get syms 2) (get x 3)))
+)
+*/
+
+// Testing out the theory of the '`' expansion:
+macros.testsub = function(list, userdata) {
+	return process(
+		// (
+		[Node('jsarray', ''), 
+
+		// -
+		[Node('fncall', 'Node'), Node('string','"mathy"'),
+		Node('string', '"-"')], // ` items are WRAPPED / taken up one level of nodes.
+
+		// ~(get syms 1)
+		list[1][2], // ~ items are extracted directly.
+
+		// ~(get syms 2)
+		list[1][4],
+
+		// (get x 3)
+		// (
+		[Node('jsarray', ''),
+
+			// get
+			[Node('fncall', 'Node'),
+			Node('string', '"fncall"'),
+			Node('string', '"get"')],
+
+			// x
+			[Node('fncall', 'Node'),
+			Node('string', '"id"'),
+			Node('string', '"x"')],
+
+			// 3
+			[Node('fncall', 'Node'),
+			Node('string', '"number"'),
+			Node('number', 3)]
+		]]); // ~ parameters are simply EXTRACTED
+}
+
+macros['bt'] = function(list, userdata) {
+	// unquoted things can be taken directly from the list
+	// quoted things are noded up...
+
+	// This definition needs to be recursive as we must nodeup items
+	// within noded up items.
+	var result = [Node('jsarray', '')];
+	var arg = list[1];
+	for (var i = 0; i < arg.length; ++i) {
+		var elem = arg[i];
+		if (!(elem instanceof Array) && elem.type == 'tilde') {
+			i += 1;
+			result.push(arg[i]);
+		} else {
+			result.push(nodeup(elem));
+		}
+	}
+
+	return result;
+};
+
+function nodeup(syms) {
+	// if syms is an array
+	// then we should call macros[bt] on it and return that result
+	// else, we node-it-up
+}
 
 
 // Not exactly macros at the moment

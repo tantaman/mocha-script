@@ -106,6 +106,8 @@ exp
 		{$$ = Node('string', yytext);}
 	| jsdata
 		{$$ = $1;}
+	| TILDE
+		{$$ = Node('tilde', yytext);}
 	| sexp
 		{$$ = $1;}
 	;
