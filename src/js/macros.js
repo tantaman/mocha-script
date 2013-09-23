@@ -19,7 +19,6 @@ macros.defmacro = function(list, userdata) {
 	list.unshift(Node('fn'));
 
 	var str = process(list, userdata);
-	console.log(str);
 	eval("var __tempMacro = " + str);
 	if (name in macros)
 		console.error('Macro ' + name + ' is being re-defined');

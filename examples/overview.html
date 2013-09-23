@@ -256,6 +256,40 @@
 <!-- PANEL -->
 	<div class="panel panel-default">
 	  <div class="panel-heading">
+	    <h3 class="panel-title" id="macros">Macros</h3>
+	  </div>
+	  <div class="panel-body">
+	  	<div class="codeDemo">
+<textarea class="ms">
+; defining a macro for unless
+(defmacro unless (syms)
+  `(if (not ~(get syms 1)) ~(get syms 2))
+)
+; use our unless macro!
+(unless true (log "Even truth is not truth"))
+
+; defining a macro for a for loop
+(defmacro forloop (syms)
+  (let (setup (get syms 1))
+    `(loop (~(get setup 0) ~(get setup 1))
+       (when ~(get setup 2)
+         ~(get syms 2)
+         (recur ~(get setup 3))
+      ))
+))
+; use our forloop macro!
+(forloop (i 0 (< i 10) (+ i 1)) (log i))
+</textarea>
+			<textarea class="js"></textarea>
+		    <div class="run btn btn-success">Compile &amp; Run</div>
+		</div>
+	  </div>
+	</div>
+<!-- END PANEL -->
+
+<!-- PANEL -->
+	<div class="panel panel-default">
+	  <div class="panel-heading">
 	    <h3 class="panel-title">Standard Library</h3>
 	  </div>
 	  <div class="panel-body">

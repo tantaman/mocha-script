@@ -128,7 +128,6 @@ macros.defmacro = function(list, userdata) {
 	list.unshift(Node('fn'));
 
 	var str = process(list, userdata);
-	console.log(str);
 	eval("var __tempMacro = " + str);
 	if (name in macros)
 		console.error('Macro ' + name + ' is being re-defined');
@@ -284,6 +283,8 @@ if (oldprocess) {
 	process.exit = oldprocess.exit;
 }
 
+// TODO: are there any conflicts with this method of lookup?
+// mainly worried about the id to fncall conversion stuff...
 function lookupProcessor(list) {
 	if (list instanceof Node)
 		return returnText;
