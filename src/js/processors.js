@@ -10,6 +10,8 @@ if (oldprocess) {
 	process.exit = oldprocess.exit;
 }
 
+// TODO: are there any conflicts with this method of lookup?
+// mainly worried about the id to fncall conversion stuff...
 function lookupProcessor(list) {
 	if (list instanceof Node)
 		return returnText;
@@ -22,8 +24,13 @@ function lookupProcessor(list) {
 	var processor = macros[lookup.key];
 	if (processor) return processor;
 
+	processor = processors[lookup.key];
+	if (processor) return processor;
+
 	processor = processors[lookup.type];
-	return processor;
+	if (processor) return processor;
+
+	return processors.fncall;
 }
 
 function returnText(node) {
@@ -233,7 +240,7 @@ processors.set = function(list, userdata) {
 };
 
 processors.refprop = function(list, userdata) {
-	return "(" + process(list[2], userdata) + ")." + list[1];
+	return "(" + process(list[1], userdata) + ")." + list[0].toString().substring(1);
 };
 
 processors.def = function(list, userdata) {
@@ -241,8 +248,8 @@ processors.def = function(list, userdata) {
 };
 
 processors.mcall = function(list, userdata) {
-	return "(" + process(list[2], userdata) + ")." + list[1] + "("
-		 + processors.parameters(rest(list, 3), userdata) + ")";
+	return "(" + process(list[1], userdata) + ")" + list[0] + "("
+		 + processors.parameters(rest(list, 2), userdata) + ")";
 };
 
 // TODO: add default parameters
