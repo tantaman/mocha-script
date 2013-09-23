@@ -9,6 +9,7 @@ function Node(type, key, text) {
 
 function quoteIfString(item) {
   if (typeof item === 'string') {
+    item = item.replace(/"/g, '\\"');
     return '"' + item + '"';
   }
   return item;
@@ -19,8 +20,11 @@ Node.prototype.toString = function() {
 };
 
 Node.prototype.toConstructionString = function() {
-  return "Node('" + this.type + "', " + quoteIfString(this.key) + ", "
-        + quoteIfString(this.text) + ")";
+  var key = quoteIfString(this.key);
+  var text = quoteIfString(this.text);
+
+  return "Node('" + this.type + "', " + key + ", "
+        + text + ")";
 }
 
 function first(arr) {

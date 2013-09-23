@@ -15,6 +15,7 @@ function Node(type, key, text) {
 
 function quoteIfString(item) {
   if (typeof item === 'string') {
+    item = item.replace(/"/g, '\\"');
     return '"' + item + '"';
   }
   return item;
@@ -25,8 +26,11 @@ Node.prototype.toString = function() {
 };
 
 Node.prototype.toConstructionString = function() {
-  return "Node('" + this.type + "', " + quoteIfString(this.key) + ", "
-        + quoteIfString(this.text) + ")";
+  var key = quoteIfString(this.key);
+  var text = quoteIfString(this.text);
+
+  return "Node('" + this.type + "', " + key + ", "
+        + text + ")";
 }
 
 function first(arr) {
@@ -508,7 +512,7 @@ processors.switch = function(list, userdata) {
 	return result + "\n}\n return __res;})()";
 };
 
-processors.set = function(list, userdata) {
+processors['!'] = function(list, userdata) {
 	return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
 };
 
@@ -1154,37 +1158,37 @@ case 1:return 8;
 break;
 case 2:return 9;
 break;
-case 3:return 'SET';
+case 3:return 20;
 break;
-case 4:return 20;
+case 4:return 21;
 break;
-case 5:return 21;
+case 5:return 14;
 break;
 case 6:return 14;
 break;
-case 7:return 14;
+case 7:return 13;
 break;
-case 8:return 13;
+case 8:return 11;
 break;
-case 9:return 11;
+case 9:return 33;
 break;
-case 10:return 33;
+case 10:return 34;
 break;
-case 11:return 34;
+case 11:return 32;
 break;
-case 12:return 32;
+case 12:return 28;
 break;
-case 13:return 28;
+case 13:return 'COMMA';
 break;
-case 14:return 'COMMA';
+case 14:return 24;
 break;
-case 15:return 24;
+case 15:return 26;
 break;
-case 16:return 26;
+case 16:return 29;
 break;
-case 17:return 29;
+case 17:return 31;
 break;
-case 18:return 31;
+case 18:return 11;
 break;
 case 19:return 11;
 break;
@@ -1202,16 +1206,14 @@ case 25:return 11;
 break;
 case 26:return 11;
 break;
-case 27:return 11;
+case 27:/* skip whitespace */
 break;
-case 28:/* skip whitespace */
-break;
-case 29:return 5;
+case 28:return 5;
 break;
 }
 },
-rules: [/^(?:;.*)/,/^(?:\()/,/^(?:\))/,/^(?:!)/,/^(?:~)/,/^(?:`)/,/^(?:"[^"]*")/,/^(?:'[^']*')/,/^(?:([-]?[0-9]*\.?[0-9]+))/,/^(?:not\b)/,/^(?:(\.[a-zA-Z$_][a-zA-Z0-9$_]*))/,/^(?:(:[a-zA-Z$_][a-zA-Z0-9$_]*))/,/^(?:([a-zA-Z$_][a-zA-Z0-9$_]*))/,/^(?::)/,/^(?:,)/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:=)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:>)/,/^(?:<)/,/^(?:>=)/,/^(?:<=)/,/^(?:\/)/,/^(?:\s+)/,/^(?:$)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],"inclusive":true}}
+rules: [/^(?:;.*)/,/^(?:\()/,/^(?:\))/,/^(?:~)/,/^(?:`)/,/^(?:"[^"]*")/,/^(?:'[^']*')/,/^(?:([-]?[0-9]*\.?[0-9]+))/,/^(?:not\b)/,/^(?:(\.[a-zA-Z$_][a-zA-Z0-9$_]*))/,/^(?:(:[a-zA-Z$_][a-zA-Z0-9$_]*))/,/^(?:([a-zA-Z$_!][a-zA-Z0-9$_!]*))/,/^(?::)/,/^(?:,)/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:=)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:>)/,/^(?:<)/,/^(?:>=)/,/^(?:<=)/,/^(?:\/)/,/^(?:\s+)/,/^(?:$)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],"inclusive":true}}
 };
 return lexer;
 })();

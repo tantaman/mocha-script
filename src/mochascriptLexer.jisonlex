@@ -1,5 +1,5 @@
 number                      [-]?[0-9]*\.?[0-9]+
-id                          [a-zA-Z$_][a-zA-Z0-9$_]*
+id                          [a-zA-Z$_!][a-zA-Z0-9$_!]*
 mcall                  		\.[a-zA-Z$_][a-zA-Z0-9$_]*
 propaccess                  \:[a-zA-Z$_][a-zA-Z0-9$_]*
 
@@ -7,7 +7,6 @@ propaccess                  \:[a-zA-Z$_][a-zA-Z0-9$_]*
 ";".*                       /* ignore comments */
 "("                         return 'LPAREN';
 ")"                         return 'RPAREN';
-"!"                         return 'SET';
 "~"							return 'TILDE';
 "`"							return 'BACKTICK';
 \"[^"]*\"                   return 'STRING';

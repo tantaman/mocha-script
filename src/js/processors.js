@@ -235,7 +235,7 @@ processors.switch = function(list, userdata) {
 	return result + "\n}\n return __res;})()";
 };
 
-processors.set = function(list, userdata) {
+processors['!'] = function(list, userdata) {
 	return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
 };
 
