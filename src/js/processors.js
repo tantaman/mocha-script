@@ -12,6 +12,12 @@ if (oldprocess) {
 
 // TODO: are there any conflicts with this method of lookup?
 // mainly worried about the id to fncall conversion stuff...
+
+// TODO: we need to make the lookup smarter
+// It shouldn't be just by name anymore but
+// by name, num args, & arg types.
+// this will allow us to construct much simpler macros
+// as well as overload macro definitions.
 function lookupProcessor(list) {
 	if (list instanceof Node)
 		return returnText;
