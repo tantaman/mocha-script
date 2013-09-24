@@ -414,9 +414,17 @@ processors.pgm = function(list, userdata) {
 processors.fnbody = function(list, userdata) {
 	var result = "";
 	list.forEach(function(item, i) {
-		if (i == list.length - 1)
-			result += "return ";
-		result += process(item, userdata) + ";\n";
+		if (i == list.length - 1) {
+			if (item instanceof Array && item[0].key == 'def') {
+				result += process(item, userdata) + ";\n";
+				result += "return " + item[1] + ";\n";
+			} else {
+				result += "return ";
+				result += process(item, userdata) + ";\n";
+			}
+		} else {
+			result += process(item, userdata) + ";\n";
+		}
 	});
 	return result;
 };
