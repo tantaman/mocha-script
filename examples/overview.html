@@ -345,16 +345,21 @@
 	</div>
 
 	<!-- includes just for the overview -->
-	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="vendor/jquery.js"></script>
 	<script src="vendor/codemirror.js"></script>
 	<script src="vendor/modes/clojure.js"></script>
 	<script src="vendor/modes/javascript.js"></script>
 	<script src="vendor/jsbeautify.js"></script>
+	<!-- end overview includes -->
 
-	<!-- actual mocha script includes -->
+	<!-- mocha script runtime includes -->
 	<script src="../dist/stdlib-dashlo.js"></script>
 	<script src="../dist/stdlib.js"></script>
+	<!-- end mocha script runtime includes -->
+
+	<!-- mocha script compiler, only needed if you are compiling in the browser for some reason -->
 	<script src="../dist/mochascriptParser.js"></script>
+
 	<!-- optional bacon include -->
 	<script src="../dist/bacon.js"></script>
 

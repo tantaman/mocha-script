@@ -297,7 +297,7 @@ macros.deftype = function(list, userdata) {
 	return process([Node('def'), list[1], [Node('fncall', 'type')].concat(rest(list, 1))]);
 };
 (function() {return macros['!!'] = wrapMacro(function(syms) {
-return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1),Node('id', "newValue", "newValue"),get(syms,3),Node('id', "oldValue", "oldValue"),[get(syms,2),Node('id', "obj", "obj")]],[Node('fncall', "!", "!"),[get(syms,2),Node('id', "obj", "obj")],Node('id', "newValue", "newValue")],[Node('fncall', "if", "if"),[Node('mathy', "not", "not"),[Node('mathy', "=", "="),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")]],[Node('fncall', "msdispatch.propChange", "msdispatch.propChange"),Node('id', "obj", "obj"),get(syms,2),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")]],Node('id', "newValue", "newValue")];
+return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1),Node('id', "newValue", "newValue"),get(syms,3),Node('id', "oldValue", "oldValue"),[get(syms,2),Node('id', "obj", "obj")]],[Node('fncall', "!", "!"),[get(syms,2),Node('id', "obj", "obj")],Node('id', "newValue", "newValue")],[Node('fncall', "msdispatch.propChange", "msdispatch.propChange"),Node('id', "obj", "obj"),get(syms,2),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")],Node('id', "newValue", "newValue")];
 
 }
 );
@@ -317,6 +317,12 @@ if (oldprocess) {
 
 // TODO: are there any conflicts with this method of lookup?
 // mainly worried about the id to fncall conversion stuff...
+
+// TODO: we need to make the lookup smarter
+// It shouldn't be just by name anymore but
+// by name, num args, & arg types.
+// this will allow us to construct much simpler macros
+// as well as overload macro definitions.
 function lookupProcessor(list) {
 	if (list instanceof Node)
 		return returnText;

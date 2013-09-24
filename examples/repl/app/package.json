@@ -4,7 +4,8 @@
   "description": "ERROR: No README.md file found!",
   "dependencies": {
     "mocha-script": "git://github.com/tantaman/mocha-script.git#production",
-    "requirejs": "~2.1.8"
+    "requirejs": "~2.1.8",
+    "codemirror": "~3.18.0"
   },
   "scripts": {
     "test": "test"

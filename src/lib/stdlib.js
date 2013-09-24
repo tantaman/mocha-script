@@ -271,6 +271,7 @@ var lib = {
 		},
 
 		propChange: function(obj, prop, newValue, oldValue) {
+			if (newValue === oldValue) return;
 			this.emitter.trigger(this.__stringForEvent(obj, prop), obj, newValue, oldValue);
 			this.emitter.trigger(this.__stringForEvent(obj), obj, newValue, oldValue, prop);
 		}

@@ -262,8 +262,6 @@ var lib = {
 			this.emitter.off(this.__stringForEvent(obj, prop), cb, ctx);
 		},
 
-		// TODO: create a new event stream every time
-		// or re-use existing ones???
 		eventStream: function(obj, prop, transformer) {
 			if (!obj.__msdoid)
 				obj.__msdoid = (this.oid += 1);
@@ -273,6 +271,7 @@ var lib = {
 		},
 
 		propChange: function(obj, prop, newValue, oldValue) {
+			if (newValue === oldValue) return;
 			this.emitter.trigger(this.__stringForEvent(obj, prop), obj, newValue, oldValue);
 			this.emitter.trigger(this.__stringForEvent(obj), obj, newValue, oldValue, prop);
 		}
