@@ -2,8 +2,8 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
-	<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="../../vendor/codemirror.css">
+	<link rel="stylesheet" href="../../vendor/bootstrap/css/bootstrap.css">
 	<style>
 	.CodeMirror {
 		background: #f8f8f8;
@@ -33,18 +33,18 @@
 	</div>
 
 	<!-- repl UI / application support stuff -->
-	<script src="vendor/jquery.js"></script>
-	<script src="node_modules/mocha-script/dist/bacon.js"></script>
-	<script src="node_modules/codemirror/lib/codemirror.js"></script>
-	<script src="node_modules/codemirror/mode/clojure/clojure.js"></script>
+	<script src="../../vendor/jquery.js"></script>
+	<script src="../../../dist/bacon.js"></script>
+	<script src="../../vendor/codemirror.js"></script>
+	<script src="../../vendor/modes/clojure.js"></script>
 
 	<!-- mocha-script runtime -->
-	<script src="node_modules/mocha-script/dist/stdlib-dashlo.js"></script>
-	<script src="node_modules/mocha-script/dist/stdlib.js"></script>	
+	<script src="../../../dist/stdlib-dashlo.js"></script>
+	<script src="../../../dist/stdlib.js"></script>	
 
 	<!-- inclusion of the mocha-script compiler for the repl -->
-	<script src="node_modules/mocha-script/dist/mochascriptParser.js"></script>
+	<script src="../../../dist/mochascriptParser.js"></script>
 
-	<script data-main="compiled-scripts/main.js" src="node_modules/requirejs/require.js"></script>
+	<script data-main="compiled-scripts/main.js" src="vendor/require.js"></script>
 </body>
 </html>
