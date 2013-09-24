@@ -1,5 +1,10 @@
+
 if (typeof module !== 'undefined' && require.main === module) {
 	var oldprocess = process; 
+}
+
+if (typeof module == 'object' && module.exports) {
+	require('./stdlib');
 }
 
 (function(root) {
@@ -298,15 +303,11 @@ macros.deftype = function(list, userdata) {
 };
 (function() {macros['!!'] = wrapMacro(function(syms) {
 return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1),Node('id', "newValue", "newValue"),get(syms,3),Node('id', "oldValue", "oldValue"),[get(syms,2),Node('id', "obj", "obj")]],[Node('fncall', "!", "!"),[get(syms,2),Node('id', "obj", "obj")],Node('id', "newValue", "newValue")],[Node('fncall', "msdispatch.propChange", "msdispatch.propChange"),Node('id', "obj", "obj"),get(syms,2),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")],Node('id', "newValue", "newValue")];
-
-}
-);
+});
 ;
 return macros['assoc!'] = wrapMacro(function(syms) {
 return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1)],[Node('fncall', "!", "!"),Node('id', "obj", "obj"),get(syms,2),get(syms,3)],Node('id', "obj", "obj")];
-
-}
-);
+});
 ;
 })();
 function process(list, userdata) {
@@ -586,15 +587,15 @@ processors['!'] = function(list, userdata) {
 };
 
 processors.refprop = function(list, userdata) {
-	if (list[0].type == "number" || list[0].type == "string") {
-		return "(" + process(list[1], userdata) + ")[" + list[0] + "]";
-	} else {
+	if (list[0].type == "refprop") {
 		return "(" + process(list[1], userdata) + ")." + list[0];
+	} else {
+		return "(" + process(list[1], userdata) + ")[" + process(list[0]) + "]";
 	}
 };
 
 processors.def = function(list, userdata) {
-	return "var " + list[1] + " = " + process(list[2], userdata) + "\n";
+	return "var " + list[1] + " = " + process(list[2], userdata);
 };
 
 processors.mcall = function(list, userdata) {
@@ -605,7 +606,7 @@ processors.mcall = function(list, userdata) {
 // TODO: add default parameters
 processors.fn = function(list, userdata) {
 	return "function(" + processors.fnparams(list[1], userdata) + ") {\n" +
-		processors.fnbody(rest(list, 2), userdata) + "\n}\n";
+		processors.fnbody(rest(list, 2), userdata) + "}";
 };
 
 processors.fnparams = function(list, userdata) {

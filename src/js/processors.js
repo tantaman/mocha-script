@@ -275,15 +275,15 @@ processors['!'] = function(list, userdata) {
 };
 
 processors.refprop = function(list, userdata) {
-	if (list[0].type == "number" || list[0].type == "string") {
-		return "(" + process(list[1], userdata) + ")[" + list[0] + "]";
-	} else {
+	if (list[0].type == "refprop") {
 		return "(" + process(list[1], userdata) + ")." + list[0];
+	} else {
+		return "(" + process(list[1], userdata) + ")[" + process(list[0]) + "]";
 	}
 };
 
 processors.def = function(list, userdata) {
-	return "var " + list[1] + " = " + process(list[2], userdata) + "\n";
+	return "var " + list[1] + " = " + process(list[2], userdata);
 };
 
 processors.mcall = function(list, userdata) {
@@ -294,7 +294,7 @@ processors.mcall = function(list, userdata) {
 // TODO: add default parameters
 processors.fn = function(list, userdata) {
 	return "function(" + processors.fnparams(list[1], userdata) + ") {\n" +
-		processors.fnbody(rest(list, 2), userdata) + "\n}\n";
+		processors.fnbody(rest(list, 2), userdata) + "}";
 };
 
 processors.fnparams = function(list, userdata) {
