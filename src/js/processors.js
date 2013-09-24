@@ -27,6 +27,10 @@ function lookupProcessor(list) {
 		return processors.fncall;
 	}
 
+	// TODO: evaluate the sanity of this.
+	if (list[0].type == "string" || list[0].type == "number")
+		return processors.refprop;
+
 	var processor = macros[lookup.key];
 	if (processor) return processor;
 
@@ -101,9 +105,15 @@ var processors = {
 };
 
 processors.pgm = function(list, userdata) {
-	var result = "(function() {";
+	var result = "";
+	userdata = userdata || {};
+	var unwrap = (typeof ms_unwrap != 'undefined' && ms_unwrap === true) ? true : false;
+	if (!unwrap)
+		result = "(function() {";
+	userdata.unwrap = unwrap;
+
 	result += processors.fnbody(list, userdata);
-	return result + "})();"
+	return result + ((unwrap) ? "" : "})();");
 };
 
 processors.fnbody = function(list, userdata) {
@@ -112,9 +122,12 @@ processors.fnbody = function(list, userdata) {
 		if (i == list.length - 1) {
 			if (item instanceof Array && (item[0].key == 'def' || item[0].key == 'defn')) {
 				result += process(item, userdata) + ";\n";
-				result += "return " + item[1] + ";\n";
+				if (!userdata.unwrap)
+					result += "return ";
+				result += item[1] + ";\n";
 			} else {
-				result += "return ";
+				if (!userdata.unwrap)
+					result += "return ";
 				result += process(item, userdata) + ";\n";
 			}
 		} else {
@@ -253,12 +266,20 @@ processors.switch = function(list, userdata) {
 };
 
 processors['!'] = function(list, userdata) {
-	return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
+	if (list.length == 4) {
+		// TODO: return the object upon which the value was set?
+		return "(" + processors.refprop([list[2], list[1]], userdata) + " = " + process(list[3], userdata) + ")";
+	} else {
+		return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
+	}
 };
 
-// TODO: allow refprop to work with string props?
 processors.refprop = function(list, userdata) {
-	return "(" + process(list[1], userdata) + ")." + list[0].toString();
+	if (list[0].type == "number" || list[0].type == "string") {
+		return "(" + process(list[1], userdata) + ")[" + list[0] + "]";
+	} else {
+		return "(" + process(list[1], userdata) + ")." + list[0];
+	}
 };
 
 processors.def = function(list, userdata) {
@@ -267,7 +288,7 @@ processors.def = function(list, userdata) {
 
 processors.mcall = function(list, userdata) {
 	return "(" + process(list[1], userdata) + ")" + list[0] + "("
-		 + processors.parameters(rest(list, 2), userdata) + ")";
+	 + processors.parameters(rest(list, 2), userdata) + ")";
 };
 
 // TODO: add default parameters

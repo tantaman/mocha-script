@@ -275,6 +275,14 @@ var lib = {
 			this.emitter.trigger(this.__stringForEvent(obj, prop), obj, newValue, oldValue);
 			this.emitter.trigger(this.__stringForEvent(obj), obj, newValue, oldValue, prop);
 		}
+	},
+
+	assoc: function(obj, key, value) {
+
+	},
+
+	lastIndex: function(arr) {
+		return arr.length - 1;
 	}
 };
 

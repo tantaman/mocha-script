@@ -24,7 +24,7 @@ macros.defmacro = function(list, userdata) {
 		console.error('Macro ' + name + ' is being re-defined');
 	macros[name] = wrapMacro(__tempMacro);
 
-	if (typeof dumpMacros != 'undefined' && dumpMacros === 'dumpMacros') {
+	if (typeof ms_dumpMacros != 'undefined' && ms_dumpMacros === true) {
 		return "macros['" + name + "'] = wrapMacro(" + str + ");\n";
 	} else {
 		return '';
@@ -127,15 +127,15 @@ macros.type = function(list, userdata) {
 			constructor = list[i];
 		else {
 			methodDefs += list[1] + ".prototype." + list[i][0] 
-						+ " = function(" + processors.fnparams(list[i][1]) + ") {"
-						+ processors.fnbody(rest(list[i], 2))
+						+ " = function(" + processors.fnparams(list[i][1], userdata) + ") {"
+						+ processors.fnbody(rest(list[i], 2), userdata)
 						+ "};\n"
 		}
 	}
 
 	if (constructor) {
-		result += processors.fnparams(constructor[1])
-				+ ") {" + processors.fnbody(rest(constructor, 2).concat([Node('id', 'this')]))
+		result += processors.fnparams(constructor[1], userdata)
+				+ ") {" + processors.fnbody(rest(constructor, 2).concat([Node('id', 'this')]), userdata)
 				+ "}\n";
 	} else {
 		result += "){}\n";
@@ -157,12 +157,12 @@ macros.type = function(list, userdata) {
 	result += methodDefs;
 
 	if (mixins) {
-		result += "extend(" + list[1] + ".prototype, " + processors.parameters(rest(mixins, 1)) + ");\n";
+		result += "extend(" + list[1] + ".prototype, " + processors.parameters(rest(mixins, 1), userdata) + ");\n";
 	}
 
 	return result + "return " + list[1] + "; })()";
 };
 
 macros.deftype = function(list, userdata) {
-	return process([Node('def'), list[1], [Node('fncall', 'type')].concat(rest(list, 1))]);
+	return process([Node('def'), list[1], [Node('fncall', 'type')].concat(rest(list, 1))], userdata);
 };

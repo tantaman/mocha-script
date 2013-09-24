@@ -1,4 +1,5 @@
 (require [] (fn ()
+	(! window.ms_unwrap true)
 	(def mirror 
 		(CodeMirror.fromTextArea (get ($.find "#repl-in") 0) {mode: "text/x-clojure"}))
 
@@ -25,7 +26,13 @@
 
 	(defn processExpression (expr)
 		; todo: mocha-script needs try/catch so we can handle parse errors!!
-		(eval (+ "__temp = " (.parse mochascriptParser expr)))
+		(let (code (.parse mochascriptParser expr) split (.split code "\n"))
+			(if (= (.indexOf code "var") 0)
+				(eval (.join 
+					(assoc! split (lastIndex split) (+ "__temp = " (last split))) "\n"))
+				(eval (+ "__temp = " code))
+			))
+
 		(showResult __temp)
 		(.setValue mirror "")
 	)

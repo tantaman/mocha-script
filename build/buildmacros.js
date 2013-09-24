@@ -4,7 +4,7 @@ var fs = require('fs');
 
 // TODO: make a way to pass args to the parser
 // instead of this
-global.dumpMacros = 'dumpMacros';
+global.ms_dumpMacros = true;
 
 console.log(parser.parse(fs.readFileSync('../src/ms/stdmacros.ms', 'utf8')));
 

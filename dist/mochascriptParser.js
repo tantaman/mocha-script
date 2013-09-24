@@ -154,7 +154,7 @@ macros.defmacro = function(list, userdata) {
 		console.error('Macro ' + name + ' is being re-defined');
 	macros[name] = wrapMacro(__tempMacro);
 
-	if (typeof dumpMacros != 'undefined' && dumpMacros === 'dumpMacros') {
+	if (typeof ms_dumpMacros != 'undefined' && ms_dumpMacros === true) {
 		return "macros['" + name + "'] = wrapMacro(" + str + ");\n";
 	} else {
 		return '';
@@ -257,15 +257,15 @@ macros.type = function(list, userdata) {
 			constructor = list[i];
 		else {
 			methodDefs += list[1] + ".prototype." + list[i][0] 
-						+ " = function(" + processors.fnparams(list[i][1]) + ") {"
-						+ processors.fnbody(rest(list[i], 2))
+						+ " = function(" + processors.fnparams(list[i][1], userdata) + ") {"
+						+ processors.fnbody(rest(list[i], 2), userdata)
 						+ "};\n"
 		}
 	}
 
 	if (constructor) {
-		result += processors.fnparams(constructor[1])
-				+ ") {" + processors.fnbody(rest(constructor, 2).concat([Node('id', 'this')]))
+		result += processors.fnparams(constructor[1], userdata)
+				+ ") {" + processors.fnbody(rest(constructor, 2).concat([Node('id', 'this')]), userdata)
 				+ "}\n";
 	} else {
 		result += "){}\n";
@@ -287,17 +287,23 @@ macros.type = function(list, userdata) {
 	result += methodDefs;
 
 	if (mixins) {
-		result += "extend(" + list[1] + ".prototype, " + processors.parameters(rest(mixins, 1)) + ");\n";
+		result += "extend(" + list[1] + ".prototype, " + processors.parameters(rest(mixins, 1), userdata) + ");\n";
 	}
 
 	return result + "return " + list[1] + "; })()";
 };
 
 macros.deftype = function(list, userdata) {
-	return process([Node('def'), list[1], [Node('fncall', 'type')].concat(rest(list, 1))]);
+	return process([Node('def'), list[1], [Node('fncall', 'type')].concat(rest(list, 1))], userdata);
 };
-(function() {return macros['!!'] = wrapMacro(function(syms) {
+(function() {macros['!!'] = wrapMacro(function(syms) {
 return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1),Node('id', "newValue", "newValue"),get(syms,3),Node('id', "oldValue", "oldValue"),[get(syms,2),Node('id', "obj", "obj")]],[Node('fncall', "!", "!"),[get(syms,2),Node('id', "obj", "obj")],Node('id', "newValue", "newValue")],[Node('fncall', "msdispatch.propChange", "msdispatch.propChange"),Node('id', "obj", "obj"),get(syms,2),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")],Node('id', "newValue", "newValue")];
+
+}
+);
+;
+return macros['assoc!'] = wrapMacro(function(syms) {
+return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1)],[Node('fncall', "!", "!"),Node('id', "obj", "obj"),get(syms,2),get(syms,3)],Node('id', "obj", "obj")];
 
 }
 );
@@ -331,6 +337,10 @@ function lookupProcessor(list) {
 	if (lookup instanceof Array) {
 		return processors.fncall;
 	}
+
+	// TODO: evaluate the sanity of this.
+	if (list[0].type == "string" || list[0].type == "number")
+		return processors.refprop;
 
 	var processor = macros[lookup.key];
 	if (processor) return processor;
@@ -406,9 +416,15 @@ var processors = {
 };
 
 processors.pgm = function(list, userdata) {
-	var result = "(function() {";
+	var result = "";
+	userdata = userdata || {};
+	var unwrap = (typeof ms_unwrap != 'undefined' && ms_unwrap === true) ? true : false;
+	if (!unwrap)
+		result = "(function() {";
+	userdata.unwrap = unwrap;
+
 	result += processors.fnbody(list, userdata);
-	return result + "})();"
+	return result + ((unwrap) ? "" : "})();");
 };
 
 processors.fnbody = function(list, userdata) {
@@ -417,9 +433,12 @@ processors.fnbody = function(list, userdata) {
 		if (i == list.length - 1) {
 			if (item instanceof Array && (item[0].key == 'def' || item[0].key == 'defn')) {
 				result += process(item, userdata) + ";\n";
-				result += "return " + item[1] + ";\n";
+				if (!userdata.unwrap)
+					result += "return ";
+				result += item[1] + ";\n";
 			} else {
-				result += "return ";
+				if (!userdata.unwrap)
+					result += "return ";
 				result += process(item, userdata) + ";\n";
 			}
 		} else {
@@ -558,12 +577,20 @@ processors.switch = function(list, userdata) {
 };
 
 processors['!'] = function(list, userdata) {
-	return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
+	if (list.length == 4) {
+		// TODO: return the object upon which the value was set?
+		return "(" + processors.refprop([list[2], list[1]], userdata) + " = " + process(list[3], userdata) + ")";
+	} else {
+		return "(" + process(list[1], userdata) + " = " + process(list[2], userdata) + ")";
+	}
 };
 
-// TODO: allow refprop to work with string props?
 processors.refprop = function(list, userdata) {
-	return "(" + process(list[1], userdata) + ")." + list[0].toString();
+	if (list[0].type == "number" || list[0].type == "string") {
+		return "(" + process(list[1], userdata) + ")[" + list[0] + "]";
+	} else {
+		return "(" + process(list[1], userdata) + ")." + list[0];
+	}
 };
 
 processors.def = function(list, userdata) {
@@ -572,7 +599,7 @@ processors.def = function(list, userdata) {
 
 processors.mcall = function(list, userdata) {
 	return "(" + process(list[1], userdata) + ")" + list[0] + "("
-		 + processors.parameters(rest(list, 2), userdata) + ")";
+	 + processors.parameters(rest(list, 2), userdata) + ")";
 };
 
 // TODO: add default parameters

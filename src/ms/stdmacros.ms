@@ -5,3 +5,9 @@
 		(msdispatch.propChange obj ~(get syms 2) newValue oldValue)
 		newValue
 	))
+
+;(assoc! exp key val)
+(defmacro assoc! (syms)
+	`(let (obj ~(get syms 1))
+		(! obj ~(get syms 2) ~(get syms 3))
+		obj))
