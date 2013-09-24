@@ -415,7 +415,7 @@ processors.fnbody = function(list, userdata) {
 	var result = "";
 	list.forEach(function(item, i) {
 		if (i == list.length - 1) {
-			if (item instanceof Array && item[0].key == 'def') {
+			if (item instanceof Array && (item[0].key == 'def' || item[0].key == 'defn')) {
 				result += process(item, userdata) + ";\n";
 				result += "return " + item[1] + ";\n";
 			} else {

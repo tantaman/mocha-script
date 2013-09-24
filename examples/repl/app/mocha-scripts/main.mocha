@@ -32,6 +32,7 @@
 
 	(defn showResult (result)
 		(.append $replOut (+ "<p>" result "</p>"))
+		(! (:scrollTop (get $replOut 0) ) (:scrollHeight (get $replOut 0)))
 	)
 
 	1
