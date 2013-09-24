@@ -1,8 +1,7 @@
 {
-  "name": "temp",
+  "name": "mocha-script-example-project-root",
   "version": "0.0.0",
   "description": "ERROR: No README.md file found!",
-  "main": "compiled.js",
   "dependencies": {},
   "devDependencies": {
     "grunt-mocha-script": "git://github.com/tantaman/grunt-mocha-script.git#production",
