@@ -222,25 +222,6 @@ macros.do = function(list, userdata) {
 	return process([[Node('fn'), []].concat(rest(list, 1))], userdata);
 };
 
-/**
-* (obj (name (params...) body)) -> {key: (fn (params..) body)}
-*/
-macros.obj = function(list) {
-	var result = [Node('jsobject')];
-
-	for (var i = 1; i < list.length; ++i) {
-		var def = list[i];
-		if (list[i][1] instanceof Array) {
-			result.push(list[i][0]);
-			result.push([Node('fn'), list[i][1]].concat(rest(list[i], 2)));
-		} else {
-			
-		}
-	}
-
-	return process(result);
-};
-
 // TODO: convert to a list of existing symbols instead of generating the JS
 macros.type = function(list, userdata) {
 	var result = "(function() { function " + list[1] + "(";
@@ -305,8 +286,22 @@ macros.deftype = function(list, userdata) {
 return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1),Node('id', "newValue", "newValue"),get(syms,3),Node('id', "oldValue", "oldValue"),[get(syms,2),Node('id', "obj", "obj")]],[Node('fncall', "!", "!"),[get(syms,2),Node('id', "obj", "obj")],Node('id', "newValue", "newValue")],[Node('fncall', "msdispatch.propChange", "msdispatch.propChange"),Node('id', "obj", "obj"),get(syms,2),Node('id', "newValue", "newValue"),Node('id', "oldValue", "oldValue")],Node('id', "newValue", "newValue")];
 });
 ;
-return macros['assoc!'] = wrapMacro(function(syms) {
+macros['assoc!'] = wrapMacro(function(syms) {
 return [Node('fncall', "let", "let"),[Node('fncall', "obj", "obj"),get(syms,1)],[Node('fncall', "!", "!"),Node('id', "obj", "obj"),get(syms,2),get(syms,3)],Node('id', "obj", "obj")];
+});
+;
+return macros['obj'] = wrapMacro(function(syms) {
+return (function() { var values = map(function(prop) {
+return ((prop.length===2) ? (prop)[1] : [Node('fncall', "fn", "fn"),(prop)[1],rest(prop,2)])
+;
+},rest(syms));
+var keys = map(function(prop) {
+return (prop)[0];
+},rest(syms));
+
+return ([Node("jsobject")]).concat(flatten(zip(keys,values),true));
+
+})();
 });
 ;
 })();
