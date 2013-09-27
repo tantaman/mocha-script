@@ -40,15 +40,19 @@ macros['`'] = function(list, userdata) {
 function deepToConstructionString(items) {
 	// TODO items may not necessarily be an array.
 	var result = '[';
-	var first = true;
-
 	for (var i = 0; i < items.length; ++i) {
 		var item = items[i];
-		if (first) first = false; else result += ',';
+		if (i != 0) result += ',';
 
 		if (item instanceof Array) {
 			if (item[0].type == '~') {
 				result += process(item[1]);
+			} else if (item[0].type == '~@') {
+				var arr = process(item[1]);
+				for (var j = 0; j < arr.length; ++j) {
+					if (j != 0) result += ',';
+					result += arr[i];
+				}
 			} else {
 				result += deepToConstructionString(item);
 			}
@@ -85,25 +89,6 @@ macros.when = function(list, userdata) {
 */
 macros.do = function(list, userdata) {
 	return process([[Node('fn'), []].concat(rest(list, 1))], userdata);
-};
-
-/**
-* (obj (name (params...) body)) -> {key: (fn (params..) body)}
-*/
-macros.obj = function(list) {
-	var result = [Node('jsobject')];
-
-	for (var i = 1; i < list.length; ++i) {
-		var def = list[i];
-		if (list[i][1] instanceof Array) {
-			result.push(list[i][0]);
-			result.push([Node('fn'), list[i][1]].concat(rest(list[i], 2)));
-		} else {
-			
-		}
-	}
-
-	return process(result);
 };
 
 // TODO: convert to a list of existing symbols instead of generating the JS
