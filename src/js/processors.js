@@ -143,6 +143,16 @@ processors.if = function(list, userdata) {
 		   " : " + process(list[3], userdata) + ")\n";
 };
 
+processors.instanceof = function(list, userdata) {
+	return "(" + process(list[1], userdata) + 
+		" instanceof " + process(list[2], userdata) +
+		")";
+};
+
+processors.typeof = function(list, userdata) {
+	return "(typeof " + process(list[1], userdata) + ")";
+};
+
 processors.fncall = function(list, userdata) {
 	if (list[0] instanceof Array) {
 		return "(" + process(list[0], userdata) + ")("
