@@ -1,0 +1,94 @@
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8">
+	<title>MochaScript Sandbox</title>
+	<link rel="stylesheet" href="vendor/codemirror.css">
+	<style>
+		#js {
+		}
+
+		#ms {
+			float: left;
+		}
+
+		#output {
+			margin-top: 30px;
+		}
+
+		textarea {
+			width: 800px;
+			height: 400px;
+		}
+
+		.CodeMirror {
+			width: 600px;
+			height: 400px;
+			border: 1px solid black;
+			background: #f8f8f8;
+			font-family: monospace;
+			margin-right: 10px;
+		}
+
+		.codeContainer {
+			float: left;
+		}
+	</style>
+</head>
+<body>
+
+<div class="codeContainer">
+Mocha-Script
+<textarea id="ms">
+(def sayhi (fn (name) (alert (+ "hello " name))))
+
+(def api "http://api.stackexchange.com/2.1/answers?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&order=desc&sort=activity&filter=default")
+
+(sayhi "explorer")
+
+(.get $ api (fn (data)
+              (alert (pluck (pluck (:items data) 'owner') 'display_name'))))
+</textarea>
+</div>
+<div class="codeContainer">
+Compiled JavaScript
+<textarea id="js">
+</textarea>
+</div>
+
+	<button id="run">Compile & Run</button>
+	
+	<div style="clear: both;"></div>
+	<div id="output"></div>
+
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="vendor/codemirror.js"></script>
+	<script src="vendor/modes/clojure.js"></script>
+	<script src="vendor/modes/javascript.js"></script>
+	<script src="vendor/jsbeautify.js"></script>
+
+	<script src="../dist/stdlib-dashlo.js"></script>
+	<script src="../dist/stdlib.js"></script>
+	<script src="../dist/mochascriptParser.js"></script>
+	<script>
+		var $ms = $('#ms');
+		var $js = $('#js');
+		var $output = $('#output')
+
+		$("#generate").click(generate);
+
+		function generate() {
+			var result = mochascriptParser.parse(msMirror.getValue());
+			result = js_beautify(result);
+			jsMirror.setValue(result);
+			return result;
+		}
+
+		$("#run").click(function() {
+			eval(generate());
+		});
+
+		var msMirror = CodeMirror.fromTextArea($ms[0], {mode: 'text/x-clojure'});
+		var jsMirror = CodeMirror.fromTextArea($js[0], {mode: 'javascript'});
+	</script>
+</body>
+</html>

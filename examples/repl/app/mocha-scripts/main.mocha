@@ -1,0 +1,37 @@
+(require [] (fn ()
+	(! window.ms_unwrap true)
+	(def mirror 
+		(CodeMirror.fromTextArea (get ($.find "#repl-in") 0) {mode: "text/x-clojure"}))
+
+	(def $replOut ($ "#repl-out"))
+
+	(defn adaptMirror (mirror)
+		(! mirror.bind mirror.on)
+		(! mirror.unbind mirror.off)
+		(.addKeyMap mirror {Enter: (fn () CodeMirror.Pass)}))
+
+	(defn is (x) (fn (y) (= x y)))
+	(defn getarg (n) (fn () (get arguments n)))
+	(defn eventStream (obj event transform) (Bacon.fromEventTarget obj event transform))
+
+	(adaptMirror mirror)
+
+	(.subscribe
+		(.filter
+			(eventStream mirror "keyHandled" (getarg 1))
+			(is "Enter")) ; todo: is enter and shift isn't pressed...
+		(fn (event)
+			(processExpression (.getValue mirror))
+		))
+
+	(defn processExpression (expr)
+		; todo: mocha-script needs try/catch so we can handle parse errors!!
+		(showResult (.call eval window (.parse mochascriptParser expr)));
+		(.setValue mirror "")
+	)
+
+	(defn showResult (result)
+		(.append $replOut (+ "<p>" result "</p>"))
+		(! (:scrollTop (get $replOut 0) ) (:scrollHeight (get $replOut 0)))
+	)
+))

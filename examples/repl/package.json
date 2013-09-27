@@ -1,0 +1,17 @@
+{
+  "name": "mocha-script-example-project-root",
+  "version": "0.0.0",
+  "description": "ERROR: No README.md file found!",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt-mocha-script": "git://github.com/tantaman/grunt-mocha-script.git#production",
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD"
+}
