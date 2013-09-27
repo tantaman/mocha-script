@@ -191,6 +191,8 @@ var lib = {
 		return result;
 	},
 
+	// TODO: this can be improved based on the various observations
+	// from the yellow book.
 	nary: function nary(binary, args) {
 		var len = args.length;
 		var result = args[0];
@@ -208,6 +210,8 @@ var lib = {
 	bminus: function bminus(l, r) { return l - r; },
 	bmult: function bmult(l, r) { return l * r; },
 	bdivide: function bdivide(l, r) { return l / r; },
+	bor: function bor(l, r) { return l || r; },
+	band: function band(l, r) { return l && r; },
 
 	lt: function lt() { return boolNary(blt, arguments); },
 	gt: function gt() { return boolNary(bgt, arguments); },
@@ -218,6 +222,8 @@ var lib = {
 	minus: function minus() { return nary(bminus, arguments); },
 	mult: function mult() { return nary(bmult, arguments); },
 	divide: function divide() { return nary(bdivide, arguments); },
+	or: function or() { return nary(bor, arguments); },
+	and: function and() { return nary(band, arguments); },
 
 	not: function not(a) {return !a;},
 
