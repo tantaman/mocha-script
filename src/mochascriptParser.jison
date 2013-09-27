@@ -39,6 +39,8 @@ exp
 		{$$ = $1;}
 	| tilde
 		{$$ = $1;}
+	| tildeat
+		{$$ = $1;}
 	| backtick
 		{$$ = $1;}
 	| sexp
@@ -54,6 +56,11 @@ exp
 tilde
 	: TILDE exp
 		{$$ = [Node('~', ''), $2];}
+	;
+
+tildeat
+	: TILDE_AT exp
+		{$$ = [Node('~@', ''), $2];}
 	;
 
 backtick

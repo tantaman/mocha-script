@@ -40,15 +40,19 @@ macros['`'] = function(list, userdata) {
 function deepToConstructionString(items) {
 	// TODO items may not necessarily be an array.
 	var result = '[';
-	var first = true;
-
 	for (var i = 0; i < items.length; ++i) {
 		var item = items[i];
-		if (first) first = false; else result += ',';
+		if (i != 0) result += ',';
 
 		if (item instanceof Array) {
 			if (item[0].type == '~') {
 				result += process(item[1]);
+			} else if (item[0].type == '~@') {
+				var arr = process(item[1]);
+				for (var j = 0; j < arr.length; ++j) {
+					if (j != 0) result += ',';
+					result += arr[i];
+				}
 			} else {
 				result += deepToConstructionString(item);
 			}
