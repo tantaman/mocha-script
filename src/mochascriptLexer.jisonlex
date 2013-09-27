@@ -10,8 +10,7 @@ propaccess                  \:[a-zA-Z$_!][a-zA-Z0-9$_!.]*
 "~"							return 'TILDE';
 "~@"						return 'TILDE_AT';
 "`"							return 'BACKTICK';
-\"[^"]*\"                   return 'STRING';
-\'[^']*\'                   return 'STRING';
+\"(?:[^"\\]|\\.)*\"         return 'STRING';
 {number}                    return 'NUMBER';
 "not"						return 'MATHY';
 {mcall}               		return 'MCALL';
