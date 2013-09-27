@@ -1,0 +1,29 @@
+{
+  "name": "mocha-script",
+  "version": "0.1.0",
+  "description": "Lisp with Javascript interop",
+  "main": "mochascriptParser.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "js-beautify": "~1.4.0",
+    "jison": "~0.4.10"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tantaman/mocha-script.git"
+  },
+  "keywords": [
+    "javascript",
+    "lisp"
+  ],
+  "author": "Matt Crinklaw",
+  "license": "MIT"
+}
