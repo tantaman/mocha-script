@@ -120,18 +120,27 @@ processors.unroll = function(list, userdata) {
 	return processors.fnbody([list], userdata);
 }
 
-processors.fnbody = function(list, userdata) {
-	var result = "";
+function isUnroll(item) {
+	return item instanceof Array && item.length == 2 && item[0].type == 'unroll';
+}
+
+function restUnrolled(unrolled) {
+	if (unrolled[0].type === 'jsarry')
+		return rest(unrolled);
+	return unrolled;
+}
+
+// Allow userdata.commas and userdata.unwrap
+// so we can leverage this for unrolling?
+// rename from fnbody to... exp list?
+processors.fnbody = function(list, userdata, unroll) {
+	var result = unroll || [];
 	list.forEach(function(item, i) {
 		if (i == list.length - 1) {
 			if (item instanceof Array && (item[0].key == 'def' || item[0].key == 'defn')) {
-				result += process(item, userdata) + ";\n";
-				if (!userdata.unwrap)
-					result += "return ";
-				result += item[1] + ";\n";
+				result.push(process(item, userdata) + ";\n");
+				result.push(item[1] + ";\n");
 			} else {
-				if (!userdata.unwrap)
-					result += "return ";
 				handleItem(item);
 			}
 		} else {
@@ -140,16 +149,20 @@ processors.fnbody = function(list, userdata) {
 	});
 
 	function handleItem(item) {
-		if (item instanceof Array && item.length == 2 && item[0].type == 'unroll') {
+		if (isUnroll(item)) {
 			item[1].forEach(function(unrolled, i) {
-				result += processors.fnbody(rest(unrolled), userdata);
+				processors.fnbody(restUnrolled(unrolled), userdata, result);
 			});
 		} else {
-			result += process(item, userdata) + ";\n";
+			result.push(process(item, userdata) + ";\n");
 		}
 	}
 
-	return result;
+	if (!userdata.unwrap && !unroll) {
+		result[result.length - 1] = "return " + result[result.length - 1];
+	}
+
+	return result.join("");
 };
 
 processors.if = function(list, userdata) {
