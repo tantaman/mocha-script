@@ -73,8 +73,8 @@
 ; shortcut function definition
 (defn shorter (n) (* n n))
 
-; alert the cubes
-(alert (map (fn (n) (* n n n)) [2 4 6 8]))
+; alert the cubes with a very shorthand function definition
+(alert (map #(* %1 %1 %1) [2 4 6 8]))
 </textarea>
 				<textarea class="js"></textarea>
 			    <div class="run btn btn-success">Compile &amp; Run</div>
@@ -138,15 +138,19 @@
 
 ; get an element
 (get movies 0)
+; or this (when using a literal)
+(0 movies)
 
 ; define an object with custom keys
 (def obj {"goofy key": "value"})
 
 ; get a custom field
 (get obj "goofy key")
+; literal get
+("goofy key" obj)
 
 ; alert field
-(alert (get movies 2))
+(alert (2 movies))
 </textarea>
 			<textarea class="js"></textarea>
 		    <div class="run btn btn-success">Compile &amp; Run</div>
@@ -167,10 +171,8 @@
 ; and alert the author's names
 (def api "http://api.stackexchange.com/2.1/answers?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&order=desc&sort=activity&filter=default")
 
-(.get $ api
-	(fn (data)
-    	(alert (pluck 
-        (pluck (:items data) 'owner') 'display_name'))))
+(.get $ api #(alert (pluck 
+	(pluck (:items %1) "owner") "display_name")))
 </textarea>
 			<textarea class="js"></textarea>
 		    <div class="run btn btn-success">Compile &amp; Run</div>
@@ -193,7 +195,7 @@
 
 (def result (if true "true" "false"))
 
-(times 6 (fn () (log "hello"))) ; log hello 6 times
+(times 6 #(log "hello")) ; log hello 6 times
 
 (log (loop (z 1)
      (when (< z 5)
@@ -221,7 +223,7 @@
 ; define a type
 (deftype Animal
 	(eat (food) (log food))
-	(sleep (duration) (setTimeout (fn () (log "slept")) duration))
+	(sleep (duration) (setTimeout #(log "slept") duration))
 )
 
 ; define a type that inherits from another
