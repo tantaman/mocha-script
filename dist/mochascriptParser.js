@@ -195,11 +195,8 @@ function deepToConstructionString(items) {
 			if (item[0].type == '~') {
 				result += process(item[1]);
 			} else if (item[0].type == '~@') {
-				var arr = process(item[1]);
-				for (var j = 0; j < arr.length; ++j) {
-					if (j != 0) result += ',';
-					result += arr[i];
-				}
+				var processed = process(item[1]);
+				result += "[Node('unroll', '')," + processed + "]";
 			} else {
 				result += deepToConstructionString(item);
 			}
@@ -443,6 +440,10 @@ processors.pgm = function(list, userdata) {
 	return result + ((unwrap) ? "" : "})();");
 };
 
+processors.unroll = function(list, userdata) {
+	return processors.fnbody([list], userdata);
+}
+
 processors.fnbody = function(list, userdata) {
 	var result = "";
 	list.forEach(function(item, i) {
@@ -455,12 +456,23 @@ processors.fnbody = function(list, userdata) {
 			} else {
 				if (!userdata.unwrap)
 					result += "return ";
-				result += process(item, userdata) + ";\n";
+				handleItem(item);
 			}
+		} else {
+			handleItem(item);
+		}
+	});
+
+	function handleItem(item) {
+		if (item instanceof Array && item.length == 2 && item[0].type == 'unroll') {
+			item[1].forEach(function(unrolled, i) {
+				result += processors.fnbody(rest(unrolled), userdata);
+			});
 		} else {
 			result += process(item, userdata) + ";\n";
 		}
-	});
+	}
+
 	return result;
 };
 
@@ -503,15 +515,22 @@ processors.new = function(list, userdata) {
 			+ ")";
 };
 
-processors.parameters = function(list, userdata) {
+processors.parameters = function(list, userdata, unrolling) {
 	var result = "";
-	var first = true;
+	var first = !unrolling;
 	list.forEach(function(item) {
 		if (first) first = false; else result += ",";
 		if (item.type == 'refprop')
 			result += '"' + item.toString() + '"';
-		else
-			result += process(item, userdata);
+		else {
+			if (item instanceof Array && item.length == 2 && item[0].type === 'unroll') {
+				item[1].forEach(function(unrolled) {
+					result += processors.parameters(unrolled, userdata, true);
+				});
+			} else {
+				result += process(item, userdata);
+			}
+		}
 	});
 
 	return result;
@@ -1269,11 +1288,11 @@ case 1:return 8;
 break;
 case 2:return 9;
 break;
-case 3:return 23;
+case 3:return 25;
 break;
-case 4:return 26;
+case 4:return 23;
 break;
-case 5:return 25;
+case 5:return 26;
 break;
 case 6:return 27;
 break;
@@ -1327,7 +1346,7 @@ case 30:return 5;
 break;
 }
 },
-rules: [/^(?:;.*)/,/^(?:\()/,/^(?:\))/,/^(?:~)/,/^(?:#)/,/^(?:~@)/,/^(?:`)/,/^(?:%)/,/^(?:"(?:[^"\\]|\\.)*")/,/^(?:([-]?[0-9]*\.?[0-9]+))/,/^(?:not\b)/,/^(?:(\.[a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?:(:[a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?:([a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?::)/,/^(?:,)/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:=)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:>)/,/^(?:<)/,/^(?:>=)/,/^(?:<=)/,/^(?:\/)/,/^(?:\s+)/,/^(?:$)/],
+rules: [/^(?:;.*)/,/^(?:\()/,/^(?:\))/,/^(?:~@)/,/^(?:~)/,/^(?:#)/,/^(?:`)/,/^(?:%)/,/^(?:"(?:[^"\\]|\\.)*")/,/^(?:([-]?[0-9]*\.?[0-9]+))/,/^(?:not\b)/,/^(?:(\.[a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?:(:[a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?:([a-zA-Z$_!][a-zA-Z0-9$_!.]*))/,/^(?::)/,/^(?:,)/,/^(?:\{)/,/^(?:\})/,/^(?:\[)/,/^(?:\])/,/^(?:=)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:>)/,/^(?:<)/,/^(?:>=)/,/^(?:<=)/,/^(?:\/)/,/^(?:\s+)/,/^(?:$)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"inclusive":true}}
 };
 return lexer;

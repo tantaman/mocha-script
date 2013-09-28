@@ -48,11 +48,8 @@ function deepToConstructionString(items) {
 			if (item[0].type == '~') {
 				result += process(item[1]);
 			} else if (item[0].type == '~@') {
-				var arr = process(item[1]);
-				for (var j = 0; j < arr.length; ++j) {
-					if (j != 0) result += ',';
-					result += arr[i];
-				}
+				var processed = process(item[1]);
+				result += "[Node('unroll', '')," + processed + "]";
 			} else {
 				result += deepToConstructionString(item);
 			}

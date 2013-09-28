@@ -7,9 +7,9 @@ propaccess                  \:[a-zA-Z$_!][a-zA-Z0-9$_!.]*
 ";".*                       /* ignore comments */
 "("                         return 'LPAREN';
 ")"                         return 'RPAREN';
+"~@"						return 'TILDE_AT';
 "~"							return 'TILDE';
 "#"							return 'POUND';
-"~@"						return 'TILDE_AT';
 "`"							return 'BACKTICK';
 "%"							return 'PERCENT';
 \"(?:[^"\\]|\\.)*\"         return 'STRING';

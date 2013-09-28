@@ -116,6 +116,10 @@ processors.pgm = function(list, userdata) {
 	return result + ((unwrap) ? "" : "})();");
 };
 
+processors.unroll = function(list, userdata) {
+	return processors.fnbody([list], userdata);
+}
+
 processors.fnbody = function(list, userdata) {
 	var result = "";
 	list.forEach(function(item, i) {
@@ -128,12 +132,23 @@ processors.fnbody = function(list, userdata) {
 			} else {
 				if (!userdata.unwrap)
 					result += "return ";
-				result += process(item, userdata) + ";\n";
+				handleItem(item);
 			}
+		} else {
+			handleItem(item);
+		}
+	});
+
+	function handleItem(item) {
+		if (item instanceof Array && item.length == 2 && item[0].type == 'unroll') {
+			item[1].forEach(function(unrolled, i) {
+				result += processors.fnbody(rest(unrolled), userdata);
+			});
 		} else {
 			result += process(item, userdata) + ";\n";
 		}
-	});
+	}
+
 	return result;
 };
 
@@ -176,15 +191,22 @@ processors.new = function(list, userdata) {
 			+ ")";
 };
 
-processors.parameters = function(list, userdata) {
+processors.parameters = function(list, userdata, unrolling) {
 	var result = "";
-	var first = true;
+	var first = !unrolling;
 	list.forEach(function(item) {
 		if (first) first = false; else result += ",";
 		if (item.type == 'refprop')
 			result += '"' + item.toString() + '"';
-		else
-			result += process(item, userdata);
+		else {
+			if (item instanceof Array && item.length == 2 && item[0].type === 'unroll') {
+				item[1].forEach(function(unrolled) {
+					result += processors.parameters(unrolled, userdata, true);
+				});
+			} else {
+				result += process(item, userdata);
+			}
+		}
 	});
 
 	return result;
