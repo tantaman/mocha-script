@@ -8,8 +8,10 @@ propaccess                  \:[a-zA-Z$_!][a-zA-Z0-9$_!.]*
 "("                         return 'LPAREN';
 ")"                         return 'RPAREN';
 "~"							return 'TILDE';
+"#"							return 'POUND';
 "~@"						return 'TILDE_AT';
 "`"							return 'BACKTICK';
+"%"							return 'PERCENT';
 \"(?:[^"\\]|\\.)*\"         return 'STRING';
 {number}                    return 'NUMBER';
 "not"						return 'MATHY';

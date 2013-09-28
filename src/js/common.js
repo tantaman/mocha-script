@@ -15,7 +15,7 @@ Node.prototype.toConstructionString = function() {
   var key = quoteIfString(this.key);
   var text = quoteIfString(this.text);
 
-  return "Node('" + this.type + "', " + key + ", "
+  return this.constructor.name + "('" + this.type + "', " + key + ", "
         + text + ")";
 }
 
@@ -34,6 +34,18 @@ Refprop.prototype.toConstructionString = function() {
   var key = quoteIfString(this.key);
   var text = quoteIfString(this.text);
   return "Refprop('" + this.type + "', " + key + ", " + text + ")";
+}
+
+function PctArg(type, key, text) {
+  if (!(this instanceof PctArg))
+    return new PctArg(type, key, text);
+
+  Node.call(this, type, key, text);
+}
+PctArg.prototype = Object.create(Node.prototype);
+PctArg.prototype.toString = function() {
+  var num = this.key - 1;
+  return "arguments[" + num + "]";
 }
 
 function quoteIfString(item) {

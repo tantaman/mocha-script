@@ -76,6 +76,10 @@ macros.defn = function(list, userdata) {
 			[Node('fn'), list[2]].concat(rest(list, 3))], userdata);
 };
 
+// TODO: make this def-macroable...
+macros['#'] = function(list, userdata) {
+	return process([Node('fn'), []].concat(rest(list, 1)), userdata);
+};
 
 /**
 * (when exp body) -> (if exp (do body))

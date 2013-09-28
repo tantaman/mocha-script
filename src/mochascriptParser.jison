@@ -43,6 +43,10 @@ exp
 		{$$ = $1;}
 	| backtick
 		{$$ = $1;}
+	| pound
+		{$$ = $1;}
+	| pctarg
+		{$$ = $1;}
 	| sexp
 		{$$ = $1;}
 	| mathy
@@ -58,9 +62,19 @@ tilde
 		{$$ = [Node('~', ''), $2];}
 	;
 
+pctarg
+	: PERCENT NUMBER
+		{$$ = PctArg('pctarg', yytext);}
+	;
+
 tildeat
 	: TILDE_AT exp
 		{$$ = [Node('~@', ''), $2];}
+	;
+
+pound
+	: POUND exp
+		{$$ = [Node('#', ''), $2];}
 	;
 
 backtick
