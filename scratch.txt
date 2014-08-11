@@ -1,3 +1,6 @@
+change build to use browserify and commonjs?
+
+
 todo: macro handling
 todo: defn, doto, list comprehensions
 todo: namespaces, imports, exports

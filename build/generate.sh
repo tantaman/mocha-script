@@ -6,7 +6,8 @@ cp ../src/lib/stdlib-dashlo.js ../dist
 cat ../src/head.js \
 	../src/js/common.js \
 	../src/js/macros.js \
-	../src/js/processors.js \
+	../src/js/process-pipeline/codegen.js \
+	../src/js/process-pipeline/async-rewrite.js \
 	mochascriptParser.js \
 	../src/tail.js > ../dist/mochascriptParser.js
 
@@ -16,7 +17,8 @@ cat ../src/head.js \
 	../src/js/common.js \
 	../src/js/macros.js \
 	builtmacros \
-	../src/js/processors.js \
+	../src/js/process-pipeline/codegen.js \
+	../src/js/process-pipeline/async-rewrite.js \
 	mochascriptParser.js \
 	../src/tail.js > ../dist/mochascriptParser.js
 
